@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "931456201675",
+    "firebase_url": "https://is2020capturetheflag.firebaseio.com",
+    "project_id": "is2020capturetheflag",
+    "storage_bucket": "is2020capturetheflag.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:931456201675:android:3cad157abb02f71b02bc4e",
+        "android_client_info": {
+          "package_name": "com.junipero.capturetheflag"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "931456201675-14ca9g0ku469lf13oo0c4qn3d7pk6h42.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBC7J830dTXkrxKwEaJUUG6E-OnF8SsLtU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "931456201675-14ca9g0ku469lf13oo0c4qn3d7pk6h42.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
