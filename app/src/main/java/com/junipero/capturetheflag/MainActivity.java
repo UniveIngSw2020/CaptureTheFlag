@@ -1,11 +1,10 @@
 package com.junipero.capturetheflag;
 
+import java.net.HttpCookie;
 import java.util.List;
 import java.util.Locale;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -15,21 +14,29 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-public class MainActivity extends Activity {
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+public class MainActivity extends AppCompatActivity {
+
+    private final String TAG = "MainActivity";
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LocationManager locationManager;
         String context = Context.LOCATION_SERVICE;
-        locationManager = (LocationManager) getSystemService(context);
+        LocationManager locationManager = (LocationManager) getSystemService(context);
 
         Criteria crta = new Criteria();
         crta.setAccuracy(Criteria.ACCURACY_FINE);
@@ -37,7 +44,8 @@ public class MainActivity extends Activity {
         crta.setBearingRequired(false);
         crta.setCostAllowed(true);
         crta.setPowerRequirement(Criteria.POWER_LOW);
-        String provider = locationManager.getBestProvider(crta, true);
+        String provider;
+        provider = locationManager.getBestProvider(crta, true);
 
 
         checkLocationPermission();
@@ -46,6 +54,38 @@ public class MainActivity extends Activity {
 
         locationManager.requestLocationUpdates(provider, 1000, 0,
                 locationListener);
+
+
+        /*
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("message");
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                String value = dataSnapshot.getValue(String.class);
+                Log.d(TAG, "Value is: " + value);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Failed to read value
+                Log.w(TAG, "Failed to read value.", error.toException());
+            }
+        });
+
+
+        myRef.setValue("Hello, World!");
+        myRef.setValue("Hello, World2!");
+        myRef.setValue("Hello, World3!");
+*/
+
+        GameDB db = new GameDB();
+
+        db.setValue("sono IN");
+        db.setValue("sono ancora IN");
+        db.setValue("sono nuovamente In");
 
 
     }

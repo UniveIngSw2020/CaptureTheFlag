@@ -1,34 +1,34 @@
 {
   "project_info": {
-    "project_number": "931456201675",
-    "firebase_url": "https://is2020capturetheflag.firebaseio.com",
-    "project_id": "is2020capturetheflag",
-    "storage_bucket": "is2020capturetheflag.appspot.com"
+    "project_number": "788135316767",
+    "firebase_url": "https://iscapturetheflag.firebaseio.com",
+    "project_id": "iscapturetheflag",
+    "storage_bucket": "iscapturetheflag.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:931456201675:android:3cad157abb02f71b02bc4e",
+        "mobilesdk_app_id": "1:788135316767:android:b4fe0e60bc6707cb87742a",
         "android_client_info": {
           "package_name": "com.junipero.capturetheflag"
         }
       },
       "oauth_client": [
         {
-          "client_id": "931456201675-14ca9g0ku469lf13oo0c4qn3d7pk6h42.apps.googleusercontent.com",
+          "client_id": "788135316767-d0mke3i4vojkm8j64fue2tccssfb3ci6.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBC7J830dTXkrxKwEaJUUG6E-OnF8SsLtU"
+          "current_key": "AIzaSyD1M3dDYaLTrhCL-nCQDHmz31tt143HeFU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "931456201675-14ca9g0ku469lf13oo0c4qn3d7pk6h42.apps.googleusercontent.com",
+              "client_id": "788135316767-d0mke3i4vojkm8j64fue2tccssfb3ci6.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
