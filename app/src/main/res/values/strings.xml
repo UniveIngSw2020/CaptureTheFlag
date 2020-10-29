@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CaptureTheFlag</string>
+    <string name="saved_high_score_key">14</string>
 </resources>

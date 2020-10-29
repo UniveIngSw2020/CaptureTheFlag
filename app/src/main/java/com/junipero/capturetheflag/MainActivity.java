@@ -1,11 +1,28 @@
 package com.junipero.capturetheflag;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.HttpCookie;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Time;
 import java.util.List;
 import java.util.Locale;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Criteria;
@@ -14,8 +31,10 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,14 +46,70 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MainActivity extends AppCompatActivity {
 
     private final String TAG = "MainActivity";
+    private final String Myname = "Nasi";
+   // private final String path = MainActivity.this.getFilesDir() + "/userdata/data";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        //-------------------------------------------------
+
+/*
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(getString(R.string.saved_high_score_key), 3);
+        editor.apply();
+        */
+
+        //StoredDataManager sdm = new StoredDataManager(path);
+
+        File file = new File(MainActivity.this.getFilesDir(), "userData");
+        if (!file.exists()) {
+            file.mkdir();
+            try {
+                File gpxfile = new File(file, "data");
+                FileWriter writer = new FileWriter(gpxfile);
+                //writer.append("Ciao ho scritto forse la mia prima riga in un file dentro Android");
+                writer.write("ID: \nName: \nWins: \nLosts: \nTies: \n" );
+                writer.flush();
+                writer.close();
+                //output.setText(readFile());
+                //Toast.makeText(MainActivity.this, "Saved your text", Toast.LENGTH_LONG).show();
+            } catch (Exception e) { }
+        }else{
+            File fileEvents = new File(MainActivity.this.getFilesDir() + "/userData/data");
+            StringBuilder text = new StringBuilder();
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(fileEvents));
+                String line;
+                while ((line = br.readLine()) != null) {
+                    text.append(line);
+                    text.append('\n');
+                }
+                br.close();
+            } catch (IOException e) { }
+
+            //debug data file
+            Toast.makeText(MainActivity.this, text.toString(), Toast.LENGTH_LONG).show();
+        }
+
+
+
+
+
+
+
+
+        // -------------------------------------------------
         String context = Context.LOCATION_SERVICE;
         LocationManager locationManager = (LocationManager) getSystemService(context);
 
@@ -57,36 +132,14 @@ public class MainActivity extends AppCompatActivity {
 
 
         /*
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                String value = dataSnapshot.getValue(String.class);
-                Log.d(TAG, "Value is: " + value);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
-
-
-        myRef.setValue("Hello, World!");
-        myRef.setValue("Hello, World2!");
-        myRef.setValue("Hello, World3!");
-*/
-
         GameDB db = new GameDB();
+       // db.getDbRef().child("/" + Myname);
+
 
         db.setValue("sono IN");
         db.setValue("sono ancora IN");
         db.setValue("sono nuovamente In");
-
+        */
 
     }
 

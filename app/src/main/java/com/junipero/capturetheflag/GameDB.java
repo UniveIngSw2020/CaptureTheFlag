@@ -15,10 +15,11 @@ import static android.content.ContentValues.TAG;
 public class GameDB {
 
     private DatabaseReference dbRef = null;
+    //private final String MyName = "Nasi";
 
     public GameDB() {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
-        dbRef = db.getReference("/partita1");
+        dbRef = db.getReference();
 
         dbRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -35,6 +36,7 @@ public class GameDB {
                 Log.w(TAG, "Failed to read value.", error.toException());
             }
         });
+
     }
 
     public DatabaseReference getDbRef() {
