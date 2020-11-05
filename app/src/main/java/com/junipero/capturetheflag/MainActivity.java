@@ -12,6 +12,7 @@ import java.util.Locale;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -19,6 +20,10 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        //-------------------------------------------------
+        //------------------FILE MANAGER-------------------------------
 
         //StoredDataManager sdm = new StoredDataManager(path);
 
@@ -73,6 +78,16 @@ public class MainActivity extends AppCompatActivity {
             //Toast.makeText(MainActivity.this, text.toString(), Toast.LENGTH_LONG).show();
         }
 
+        // --------------------------------------------------------------------
+
+        Button button_create = findViewById(R.id.button_create);
+        button_create.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        Button button_join = findViewById(R.id.button_join);
 
 
 
@@ -91,8 +106,6 @@ public class MainActivity extends AppCompatActivity {
         LocationUpdater locationUpdater = new LocationUpdater(this, myLocation);
         // set the old location saved by the gps in the textView
         myLocation.setText(locationUpdater.getActualPosition());
-        //activate the updates from the locationUpdater
-        locationUpdater.getRealTimeUpdates();
 
         /*
         GameDB db = new GameDB();
@@ -105,6 +118,33 @@ public class MainActivity extends AppCompatActivity {
         */
 
     }
+
+    // ------------------------------ END ON CREATE ---------------------------------------------
+
+    /*
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+     */
 
 
     private void checkLocationPermission(){

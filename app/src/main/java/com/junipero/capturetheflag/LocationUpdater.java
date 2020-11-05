@@ -5,12 +5,8 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-
 import android.os.Bundle;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-
 import java.util.Calendar;
 import java.util.Date;
 
@@ -35,9 +31,14 @@ public class LocationUpdater {
         CTFCriteria ctfCriteria = new CTFCriteria();
         locationManager = (LocationManager)mContext.getSystemService(context);
         provider = locationManager.getBestProvider(ctfCriteria, true);
+        assert provider != null;
         Location location = locationManager.getLastKnownLocation(provider);
         updateWithNewLocation(location);
-
+        //activate the updates by the listener
+        locationManager.requestLocationUpdates(provider,
+                1000,
+                0,
+                locationListener);
     }
 
 
