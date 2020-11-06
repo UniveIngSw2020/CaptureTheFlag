@@ -14,6 +14,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Paint;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -44,58 +45,36 @@ public class MainActivity extends AppCompatActivity {
 
         //------------------FILE MANAGER-------------------------------
 
-        //StoredDataManager sdm = new StoredDataManager(path);
+        //StoredDataManager sdm = new StoredDataManager(MainActivity.this.getFilesDir());
 
-        File file = new File(MainActivity.this.getFilesDir(), "userData");
-        if (!file.exists()) {
-            file.mkdir();
-            try {
-                File gpxfile = new File(file, "data");
-                FileWriter writer = new FileWriter(gpxfile);
-                //writer.append("Ciao ho scritto forse la mia prima riga in un file dentro Android");
-                writer.write("ID: \nName: \nWins: \nLosts: \nTies: \n" );
-                writer.flush();
-                writer.close();
-                //output.setText(readFile());
-                //Toast.makeText(MainActivity.this, "Saved your text", Toast.LENGTH_LONG).show();
-            } catch (Exception e) {
-                throw new RuntimeException();
-            }
-        }else{
-            File fileEvents = new File(MainActivity.this.getFilesDir() + "/userData/data");
-            StringBuilder text = new StringBuilder();
-            try {
-                BufferedReader br = new BufferedReader(new FileReader(fileEvents));
-                String line;
-                while ((line = br.readLine()) != null) {
-                    text.append(line);
-                    text.append('\n');
-                }
-                br.close();
-            } catch (IOException e) { }
-
-            //debug data file ACTIVE THIS WHEN FIXING FILE MANAGER
-            //Toast.makeText(MainActivity.this, text.toString(), Toast.LENGTH_LONG).show();
+        if(!(new File(MainActivity.this.getFilesDir(), "userData").exists())){
+            // need to be refined this piece of code
+            startActivity(new Intent(MainActivity.this,
+                    CreateUserActivity.class));
         }
 
-        // --------------------------------------------------------------------
+
+        // -------------------BUTTONS-------------------------------
 
         Button button_create = findViewById(R.id.button_create);
         button_create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                startActivity(new Intent(MainActivity.this,
+                        CreateGameActivity.class));
             }
         });
         Button button_join = findViewById(R.id.button_join);
+        button_join.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this,
+                        JoinGameActivity.class));
+            }
+        });
 
 
-
-
-
-
-
-        // -------------------------------------------------
+        // ---------------LOCATION UPDATER-----------------
         String latLong;
         TextView myLocation;
         myLocation = findViewById(R.id.myLocation);
@@ -107,6 +86,9 @@ public class MainActivity extends AppCompatActivity {
         // set the old location saved by the gps in the textView
         myLocation.setText(locationUpdater.getActualPosition());
 
+
+
+        // ----------------- DATABASE MANAGER ---------------------------
         /*
         GameDB db = new GameDB();
        // db.getDbRef().child("/" + Myname);
