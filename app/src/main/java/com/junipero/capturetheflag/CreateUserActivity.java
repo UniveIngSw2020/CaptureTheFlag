@@ -20,9 +20,28 @@ public class CreateUserActivity extends AppCompatActivity {
 
         // this create the user's file if not exists in the local file manager ¯\_(ツ)_/¯
         StoredDataManager sdm = new StoredDataManager(CreateUserActivity.this.getFilesDir());
+        /*
         Toast.makeText(CreateUserActivity.this,
                 sdm.readFile().toString(),
                 Toast.LENGTH_LONG).show();
+
+         */
+
+        /* TEST PER GSON data manager
+            User user = new User();
+            user.setId(1);
+            user.setName("Luca");
+            user.setWins(1);
+            user.setLosts(1);
+            user.setTies(1);
+            Gson gson = new Gson();
+            String userJson = gson.toJson(user);
+            System.out.println(userJson);
+
+         */
+
+
+
 
     }
 }
