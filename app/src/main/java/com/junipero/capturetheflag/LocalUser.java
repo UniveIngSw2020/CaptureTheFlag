@@ -1,8 +1,10 @@
 package com.junipero.capturetheflag;
 
+import android.annotation.SuppressLint;
+
 import java.io.Serializable;
 
-public class UserData implements Serializable {
+public class LocalUser implements Serializable {
 
     private String id;
     private String name;
@@ -34,6 +36,7 @@ public class UserData implements Serializable {
 
 
 
+    @SuppressLint("DefaultLocale")
     @Override
     public String toString() {
         return String.format("User [id=%s, name=%s, wins=%d, losts=%d, ties=%d]"
