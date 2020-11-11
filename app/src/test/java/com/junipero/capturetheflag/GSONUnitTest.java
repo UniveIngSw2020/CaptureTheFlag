@@ -29,7 +29,7 @@ public class GSONUnitTest {
         users.add(user1);
         users.add(user2);
 
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         // print the JSON of first user in a String type
         String user1Json = gson.toJson(user1);
         System.out.println("FIRST USERS JSON FILE:\n" + user1Json + "\n");
@@ -45,12 +45,18 @@ public class GSONUnitTest {
     @Test
     public void GSONReadingTest (){
         String jsonUser = "{\"id\":\"@ID-1\",\"name\":\"Nasi\",\"wins\":13,\"losts\":3,\"ties\":4}";
-
+        String jsonUser2 = "{\n" +
+                "  \"id\": \"@ID-1\",\n" +
+                "  \"name\": \"Nasi\",\n" +
+                "  \"wins\": 13,\n" +
+                "  \"losts\": 3,\n" +
+                "  \"ties\": 4\n" +
+                "}";
         GsonBuilder gsonBuilder = new GsonBuilder();
         Gson gson = gsonBuilder.create();
 
-        // show the retrieved data of a user using toString of UserData class
-        LocalUser user = gson.fromJson(jsonUser, LocalUser.class);
+        // bind the object of JSON file into a LocalUser instance
+        LocalUser user = gson.fromJson(jsonUser2, LocalUser.class);
         System.out.println(user);
 
         //other parameters should be retrieved using the getter function of the class specified
@@ -62,7 +68,7 @@ public class GSONUnitTest {
 
         // increment a int parameter of the user class
         user.setWins(user.getWins()+1);
-        System.out.println(user.getWins());
+        System.out.println("incremented user's wins count " + user.getWins());
 
 
     }

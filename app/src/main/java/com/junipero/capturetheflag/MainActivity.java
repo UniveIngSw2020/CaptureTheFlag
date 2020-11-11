@@ -47,11 +47,17 @@ public class MainActivity extends AppCompatActivity {
 
         //StoredDataManager sdm = new StoredDataManager(MainActivity.this.getFilesDir());
 
-        if(!(new File(MainActivity.this.getFilesDir(), "userData").exists())){
+        if(!(new File(MainActivity.this.getFilesDir(), "userdata").exists())){
             // need to be refined this piece of code
             startActivity(new Intent(MainActivity.this,
                     CreateUserActivity.class));
         }
+
+        StoredDataManager sdm = new StoredDataManager(MainActivity.this.getFilesDir());
+        Toast.makeText(MainActivity.this, sdm.readData(), Toast.LENGTH_LONG)
+                .show();
+
+
 
 
         // -------------------BUTTONS-------------------------------
