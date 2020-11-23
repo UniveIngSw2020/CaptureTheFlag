@@ -44,6 +44,7 @@ public class CreateUserActivity extends AppCompatActivity {
                 user.setScore(0, 0, 0);
                 user.setName(edit_name.getText().toString());
                 sdm.writeFile(user);
+                finish();
             }
         });
 
