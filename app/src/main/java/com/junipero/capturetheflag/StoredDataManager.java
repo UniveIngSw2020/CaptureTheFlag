@@ -14,8 +14,9 @@ import java.util.Map;
 public class StoredDataManager {
 
     private File root;
+    private File data;
     private final String folder = "userdata";
-    private final String data = "data.json";
+    private final String dataFileName = "data.json";
 
     public StoredDataManager(File root) {
         this.root = new File(root, folder);
@@ -27,16 +28,18 @@ public class StoredDataManager {
             root.mkdir();
             //writeFile(createFileIfNotExists());
         }
-        writeFile(createFile());
+        data = createFile();
+        writeFile(new LocalUser());
     }
 
     private File createFile() {
-        return new File(root, data);
+        return new File(root, dataFileName);
     }
 
-    private void writeFile(File data) {
+    public void writeFile(LocalUser user) {
 
         /* build the user v1*/
+        /*
         LocalUser user = new LocalUser();
 
         user.setId(IdGenerator.generatePlayerId());
@@ -48,8 +51,7 @@ public class StoredDataManager {
         // its better using GSONBuilder for pretty printing in the file
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String userToJson = gson.toJson(user);
-
-
+         */
 
         /* build the user v2 using LocalUserMap :) */
         /*
@@ -62,7 +64,9 @@ public class StoredDataManager {
         String userToJson = gson.toJson(localUserMap);
          */
 
-
+        // write new data in the local file
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String userToJson = gson.toJson(user);
 
         try {
             FileWriter fw = new FileWriter(data);
@@ -82,7 +86,7 @@ public class StoredDataManager {
     }
 
     private StringBuilder generateStringBuilderData(){
-        File file = new File(root, data);
+        File file = new File(root, dataFileName);
         StringBuilder text = new StringBuilder();
 
         try {
