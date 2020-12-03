@@ -4,4 +4,8 @@
     <string name="ctflogo">CTFLOGO</string>
     <string name="create_lobby">Create Lobby</string>
     <string name="join_a_lobby">Join a lobby</string>
+    <string name="game_code">Game code:</string>
+    <string name="join">Join</string>
+    <string name="insert_game_code">insert game code</string>
+    <string name="wait">Wait</string>
 </resources>

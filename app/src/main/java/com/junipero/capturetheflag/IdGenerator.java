@@ -17,7 +17,7 @@ public final class IdGenerator {
         return millis.toString();
     }
 
-    public static String generateMatchIdTest(){
+    public static String generateMatchId(){
         StringBuilder id = new StringBuilder();
         Random r = new Random();
         int i, k, casual;

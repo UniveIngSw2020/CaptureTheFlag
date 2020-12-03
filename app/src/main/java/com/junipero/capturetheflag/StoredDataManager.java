@@ -26,10 +26,10 @@ public class StoredDataManager {
     private void createFolderIfNotExists() {
         if (!root.exists()) {
             root.mkdir();
+            data = createFile();
+            writeFile(new LocalUser());
             //writeFile(createFileIfNotExists());
         }
-        data = createFile();
-        writeFile(new LocalUser());
     }
 
     private File createFile() {
@@ -104,10 +104,22 @@ public class StoredDataManager {
         return text;
     }
 
-    public String readData(){
+    public LocalUser getUser(){
         StringBuilder sb = this.generateStringBuilderData();
         Gson gson = new GsonBuilder().create();
         LocalUser user = gson.fromJson(sb.toString(), LocalUser.class);
+
+        return user;
+    }
+
+    public String readData(){
+        /*
+        StringBuilder sb = this.generateStringBuilderData();
+        Gson gson = new GsonBuilder().create();
+        LocalUser user = gson.fromJson(sb.toString(), LocalUser.class);
+         */
+
+        LocalUser user = getUser();
 
         return  "ID: " + user.getId() + "\n" +
                 "NAME: " + user.getName() + "\n" +
@@ -115,6 +127,13 @@ public class StoredDataManager {
                 "LOSTS: " + user.getLosts() + "\n" +
                 "TIES: " + user.getTies() + "\n";
 
+    }
+
+    public String readName(){
+        return getUser().getName();
+    }
+    public String readID(){
+        return getUser().getId();
     }
 
 

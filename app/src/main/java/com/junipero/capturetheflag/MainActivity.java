@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
         GameDB db = new GameDB();
        // db.getDbRef().child("/" + Myname);
-        db.getDbRef().child("/test").setValue("Sono IN");
+        db.getDbRef().child("/test").setValue("Sono IN lalalal ");
 
 
         // not working lol
