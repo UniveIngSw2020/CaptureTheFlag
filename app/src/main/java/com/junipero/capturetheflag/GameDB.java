@@ -43,9 +43,20 @@ public class GameDB {
         return dbRef;
     }
 
+    /*
     public void setValue(String value){
         dbRef.setValue(value);
     }
+
+     */
+
+    // actually can't set the child in the db ¯\_(ツ)_/¯
+    /*
+    public void setChild(String child){
+        dbRef.child(child);
+    }
+
+     */
 
 
 }

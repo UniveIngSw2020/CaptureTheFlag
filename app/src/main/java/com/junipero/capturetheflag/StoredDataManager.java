@@ -47,6 +47,7 @@ public class StoredDataManager {
         //Gson gson = new Gson();
         // its better using GSONBuilder for pretty printing in the file
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        // build the JSON file by the LocalUser object
         String userToJson = gson.toJson(user);
 
 

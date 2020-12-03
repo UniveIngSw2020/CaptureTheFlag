@@ -21,6 +21,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,10 +53,13 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this,
                     CreateUserActivity.class));
         }
-
+        // DEBUG: show JSON file's content
+        /*
         StoredDataManager sdm = new StoredDataManager(MainActivity.this.getFilesDir());
         Toast.makeText(MainActivity.this, sdm.readData(), Toast.LENGTH_LONG)
                 .show();
+
+         */
 
 
 
@@ -95,12 +99,15 @@ public class MainActivity extends AppCompatActivity {
 
 
         // ----------------- DATABASE MANAGER ---------------------------
-        /*
+
         GameDB db = new GameDB();
        // db.getDbRef().child("/" + Myname);
+        db.getDbRef().child("/test").setValue("Sono IN");
 
 
-        db.setValue("sono IN");
+        // not working lol
+        /*
+        db..setValue("sono IN");
         db.setValue("sono ancora IN");
         db.setValue("sono nuovamente In");
         */
