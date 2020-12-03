@@ -10,6 +10,14 @@ public class LocalUser implements Serializable {
     private String name;
     private int wins, losts, ties;
 
+    public LocalUser(){
+        this.id = "0";
+        this.name = "None";
+        this.wins = 0;
+        this.losts = 0;
+        this.ties = 0;
+    }
+
     // ---------------- GETTER -------------------------
 
     public void setId(String id) { this.id = id; }
@@ -22,6 +30,12 @@ public class LocalUser implements Serializable {
 
     public void setTies(int ties) { this.ties = ties; }
 
+    public void setScore(int wins, int losts, int ties){
+        this.wins = wins;
+        this.losts = losts;
+        this.ties = ties;
+    }
+
     // -------- SETTER ------------------
     public String getId() { return id; }
 
@@ -32,8 +46,6 @@ public class LocalUser implements Serializable {
     public int getLosts() { return losts; }
 
     public int getTies() { return ties; }
-
-
 
 
     @SuppressLint("DefaultLocale")

@@ -17,5 +17,7 @@ public class CreateGameActivity extends AppCompatActivity {
         TextView test = findViewById(R.id.creategametv);
         test.setText("SONO NELLA CREATE GAME");
 
+        TextView gameId = findViewById(R.id.idgame);
+        gameId.setText(gameId.getText() + "\n" + IdGenerator.generateMatchIdTest());
     }
 }

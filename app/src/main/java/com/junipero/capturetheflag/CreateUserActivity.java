@@ -4,8 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 public class CreateUserActivity extends AppCompatActivity {
 
@@ -19,29 +24,29 @@ public class CreateUserActivity extends AppCompatActivity {
         tv.setText("SONO NELLA USER CREATE ACTIVITY");
 
         // this create the user's file if not exists in the local file manager ¯\_(ツ)_/¯
-        StoredDataManager sdm = new StoredDataManager(CreateUserActivity.this.getFilesDir());
-        /*
+        final StoredDataManager sdm = new StoredDataManager(CreateUserActivity.this.getFilesDir());
+
+        // finds the input field and button
+        final EditText edit_name = findViewById(R.id.inputname);
+        Button bt = findViewById(R.id.inputnamebutton);
+
+        // test for the stored data
         Toast.makeText(CreateUserActivity.this,
-                sdm.readFile().toString(),
+                sdm.readData().toString(),
                 Toast.LENGTH_LONG).show();
 
-         */
-
-        /* TEST PER GSON data manager
-            User user = new User();
-            user.setId(1);
-            user.setName("Luca");
-            user.setWins(1);
-            user.setLosts(1);
-            user.setTies(1);
-            Gson gson = new Gson();
-            String userJson = gson.toJson(user);
-            System.out.println(userJson);
-
-         */
-
-
-
+        // when the button is clicked create the user and set the fields, then write in the local file
+        bt.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                LocalUser user = new LocalUser();
+                user.setId(IdGenerator.generatePlayerId());
+                user.setScore(0, 0, 0);
+                user.setName(edit_name.getText().toString());
+                sdm.writeFile(user);
+                finish();
+            }
+        });
 
     }
 }
