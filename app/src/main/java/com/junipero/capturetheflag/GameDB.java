@@ -33,8 +33,11 @@ public class GameDB {
                 Log.d(TAG, "Value is: " + value);
 
                  */
+
                 Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
                 Log.d(TAG, "Value is: " + map);
+
+
             }
 
             @Override

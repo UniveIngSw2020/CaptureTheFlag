@@ -7,5 +7,7 @@
     <string name="game_code">Game code:</string>
     <string name="join">Join</string>
     <string name="insert_game_code">insert game code</string>
-    <string name="wait">Wait</string>
+    <string name="textview">TextView</string>
+    <string name="start">Start</string>
+    <string name="_1_10">1/10</string>
 </resources>
