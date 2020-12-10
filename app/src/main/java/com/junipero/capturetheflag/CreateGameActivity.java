@@ -1,8 +1,11 @@
 package com.junipero.capturetheflag;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +29,8 @@ public class CreateGameActivity extends AppCompatActivity {
 
         TextView test = findViewById(R.id.creategametv);
         test.setText("SONO NELLA CREATE GAME");
+
+        final Button startbutton = findViewById(R.id.startbutton);
 
         TextView gameId = findViewById(R.id.idgame);
         final TextView players_in_room = findViewById(R.id.playersnumber);
@@ -55,6 +60,11 @@ public class CreateGameActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 players_in_room.setText(snapshot.getChildrenCount() + "");
+                if(snapshot.getChildrenCount() < 4 ){
+                    startbutton.setEnabled(false);
+                }else{
+                    startbutton.setEnabled(true);
+                }
             }
 
             @Override
@@ -63,7 +73,14 @@ public class CreateGameActivity extends AppCompatActivity {
             }
         });
 
-        // if >4 can start the game
+
+
+        startbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(CreateGameActivity.this, GameActivity.class));
+            }
+        });
 
 
 

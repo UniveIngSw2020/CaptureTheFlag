@@ -36,6 +36,7 @@ public class JoinGameActivity extends AppCompatActivity {
         final DatabaseReference lobby = new GameDB().getDbRef();
         final StoredDataManager me = new StoredDataManager(JoinGameActivity.this.getFilesDir());
 
+
         // join button event actions
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,14 +48,36 @@ public class JoinGameActivity extends AppCompatActivity {
                         if (snapshot.hasChild(edit_game.getText().toString())){
                             Toast.makeText(JoinGameActivity.this, "Room TROVATA", Toast.LENGTH_SHORT)
                                     .show();
-                            // inserting my info in players table in the db
+
                             lobby.child(edit_game.getText().toString()).child("Players")
-                                .child(me.readID()).setValue(me.readName());
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if(snapshot.getChildrenCount() < 10){
+                                        // inserting my info in players table in the db
 
-                            //write code to perform in db
-                            // if > 10 cannot enter
+                                        lobby.child(edit_game.getText().toString()).child("Players")
+                                                .child(me.readID()).setValue(me.readName());
 
-                            wait_start.setText("waiting to start the game...");
+
+                                        //players.child(me.readID()).setValue(me.readName());
+                                        //write code to perform in db
+                                        // if > 10 cannot enter
+                                        Toast.makeText(JoinGameActivity.this,  Long.valueOf(snapshot.getChildrenCount()).toString() , Toast.LENGTH_SHORT).show();
+                                        wait_start.setText("waiting to start the game...");
+                                    }else{
+                                        Toast.makeText(JoinGameActivity.this, "Capienza massima raggiunta", Toast.LENGTH_SHORT)
+                                                .show();
+                                    }
+                                    // need to add if for the state of the game
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+
 
                         }else{
                             Toast.makeText(JoinGameActivity.this, "Room NON TROVATA", Toast.LENGTH_SHORT)
@@ -69,11 +92,10 @@ public class JoinGameActivity extends AppCompatActivity {
 
                     }
                 });
-
-
-                    Toast.makeText(JoinGameActivity.this, "JOINNATO", Toast.LENGTH_SHORT).show();
             }
         });
+
+
 
 
 

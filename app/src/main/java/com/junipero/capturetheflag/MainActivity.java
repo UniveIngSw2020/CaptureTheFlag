@@ -60,31 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
          */
 
-        // test incresing
-
-
-        StoredDataManager sdm = new StoredDataManager(MainActivity.this.getFilesDir());
-
-
-        Toast.makeText(MainActivity.this, sdm.readData(), Toast.LENGTH_LONG).show();
-
-        sdm.changeUsername("nasi");
-
-        sdm.increaseWins();
-        sdm.increaseWins();
-        sdm.increaseLosts();
-        sdm.increaseTies();
-        sdm.increaseTies();
-        sdm.increaseTies();
-
-
-        Toast.makeText(MainActivity.this, sdm.readData(), Toast.LENGTH_LONG).show();
-
-
-
-
-
-
         // -------------------BUTTONS-------------------------------
 
         Button button_create = findViewById(R.id.button_create);
