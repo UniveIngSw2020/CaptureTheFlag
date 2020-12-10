@@ -29,6 +29,8 @@ public class StoredDataManager {
             data = createFile();
             writeFile(new LocalUser());
             //writeFile(createFileIfNotExists());
+        }else{
+            data = createFile();
         }
     }
 
@@ -36,34 +38,8 @@ public class StoredDataManager {
         return new File(root, dataFileName);
     }
 
+    // writing in json file stored inside the phone
     public void writeFile(LocalUser user) {
-
-        /* build the user v1*/
-        /*
-        LocalUser user = new LocalUser();
-
-        user.setId(IdGenerator.generatePlayerId());
-        user.setName("Nasi");
-        user.setWins(0);
-        user.setLosts(0);
-        user.setTies(0);
-        //Gson gson = new Gson();
-        // its better using GSONBuilder for pretty printing in the file
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        // build the JSON file by the LocalUser object
-        String userToJson = gson.toJson(user);
-         */
-
-        /* build the user v2 using LocalUserMap :) */
-        /*
-        Map<String, String> user = new HashMap<>();
-        user.put("component1", "url1");
-        user.put("component2", "url1");
-        user.put("component3", "url1");
-        LocalUserMap localUserMap = new LocalUserMap(user);
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String userToJson = gson.toJson(localUserMap);
-         */
 
         // write new data in the local file
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -135,6 +111,35 @@ public class StoredDataManager {
     public String readID(){
         return getUser().getId();
     }
+
+    public void changeUsername (String username){
+        LocalUser me = getUser();
+        me.setName(username);
+        writeFile(me);
+    }
+
+    public void increaseWins(){
+        LocalUser me = getUser();
+        int counter = me.getWins() + 1;
+        me.setWins(counter);
+        writeFile(me);
+    }
+
+    public void increaseLosts(){
+        LocalUser me = getUser();
+        int counter = me.getLosts() + 1;
+        me.setLosts(counter);
+        writeFile(me);
+    }
+
+    public void increaseTies(){
+        LocalUser me = getUser();
+        int counter = me.getTies() + 1;
+        me.setTies(counter);
+        writeFile(me);
+    }
+
+
 
 
 

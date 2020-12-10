@@ -43,25 +43,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //---------------KEBAB MENU-------------------
-        /*
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            // Handle item selection
-            switch (item.getItemId()) {
-                case R.id.new_game:
-                    newGame();
-                    return true;
-                case R.id.help:
-                    showHelp();
-                    return true;
-                default:
-                    return super.onOptionsItemSelected(item);
-            }
-        }
-         */
-
-
         //------------------FILE MANAGER-------------------------------
 
         //StoredDataManager sdm = new StoredDataManager(MainActivity.this.getFilesDir());
@@ -78,6 +59,28 @@ public class MainActivity extends AppCompatActivity {
                 .show();
 
          */
+
+        // test incresing
+
+
+        StoredDataManager sdm = new StoredDataManager(MainActivity.this.getFilesDir());
+
+
+        Toast.makeText(MainActivity.this, sdm.readData(), Toast.LENGTH_LONG).show();
+
+        sdm.changeUsername("nasi");
+
+        sdm.increaseWins();
+        sdm.increaseWins();
+        sdm.increaseLosts();
+        sdm.increaseTies();
+        sdm.increaseTies();
+        sdm.increaseTies();
+
+
+        Toast.makeText(MainActivity.this, sdm.readData(), Toast.LENGTH_LONG).show();
+
+
 
 
 
@@ -149,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-
+        // kebab menu options
         switch (id){
             case R.id.action_profile:
                 moveToOption(R.id.action_profile);
