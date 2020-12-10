@@ -134,13 +134,13 @@ public class MainActivity extends AppCompatActivity {
 
     // ------------------------------ END ON CREATE ---------------------------------------------
 
-    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -149,16 +149,28 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
-        return super.onOptionsItemSelected(item);
+        switch (id){
+            case R.id.action_profile:
+                moveToOption(R.id.action_profile);
+                return true;
+            case R.id.action_help:
+                moveToOption(R.id.action_help);
+                return true;
+            case R.id.action_settings:
+                moveToOption(R.id.action_settings);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 
-     */
-
+    private void moveToOption (int id){
+        Intent i = new Intent(MainActivity.this, OptionsActivity.class);
+        i.putExtra("option", id);
+        startActivity(i);
+    }
 
     private void checkLocationPermission(){
         if (ActivityCompat.checkSelfPermission(MainActivity.this

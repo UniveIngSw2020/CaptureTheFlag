@@ -16,7 +16,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
-        <activity android:name=".CreateUserActivity"></activity>
+        <activity android:name=".OptionsActivity"></activity>
+        <activity android:name=".CreateUserActivity" />
         <activity android:name=".JoinGameActivity" />
         <activity android:name=".CreateGameActivity" />
         <activity

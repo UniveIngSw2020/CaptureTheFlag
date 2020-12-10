@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 
 import java.io.Serializable;
 
-public class LocalUser implements Serializable {
+public class LocalUser {
 
     private String id;
     private String name;
