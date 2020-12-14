@@ -57,19 +57,16 @@ public class CreateGameActivity extends AppCompatActivity {
         TextView gameId = findViewById(R.id.idgame);
         final TextView players_in_room = findViewById(R.id.playersnumber);
         // uncomment lately to use random rooms
-
+        /*
         String gameCode = IdGenerator.generateMatchId();
         gameId.setText(gameCode);
-
-
-
-
+        */
 
         /* DEBUG room */
-        /*
-        String gameCode = "l95a";
+
+        final String gameCode = "abcd";
         gameId.setText(gameCode);
-        */
+
 
         // get my data in a StoredDataManager object
         StoredDataManager me = new StoredDataManager(CreateGameActivity.this.getFilesDir());
@@ -80,8 +77,16 @@ public class CreateGameActivity extends AppCompatActivity {
         lobby.child("State").setValue("Waiting for start");
         // adding myself to the lobby
         DatabaseReference players = lobby.child("Players");
-        players.child(me.readID())
-            .setValue(me.readName());
+        players.child(me.readID()).setValue(me.readName());
+
+        /* additional debug players added to start testing of room */
+        players.child("736848276348236687").setValue("nasi2");
+        players.child("736848276348234211287").setValue("nasi3");
+        players.child("73684827634822346687").setValue("nasi4");
+        players.child("7368482314142346687").setValue("nasi5");
+        players.child("7368484554622346687").setValue("nasi6");
+        players.child("7387388374896687").setValue("nasi7");
+
 
         // get actual players in room  and enable/disable start button
         players.addValueEventListener(new ValueEventListener() {
@@ -121,24 +126,29 @@ public class CreateGameActivity extends AppCompatActivity {
                     final_players_list.add(new Quadruple<>(players_list.get(i).first, players_list.get(i).second, role, team));
                 }
 
-                /* toast debug
-                for (Quadruple q : final_players_list){
-                    Toast.makeText(CreateGameActivity.this, q.first.toString()+"\n"
-                    +q.second.toString()+"\n"
-                    +q.third.toString()+"\n"
-                            + q.fourth.toString(), Toast.LENGTH_SHORT).show();
+                // inssert into db and delete Players child
+                // delete Players from the actual lobby
+                lobby.child("Players").removeValue();
+
+                // crate teams in db then add players in their team
+                for (Quadruple player : final_players_list){
+                    // gameCode -> team -> role -> Id -> name, role
+                    // adding the nme of player into his opportune location in db
+                    lobby.child(player.fourth.toString())
+                            .child(player.third.toString())
+                            .child(player.first.toString())
+                            .child("name").setValue(player.second.toString());
+                    // adding the role of player into his opportune location in db
+                    lobby.child(player.fourth.toString())
+                            .child(player.third.toString())
+                            .child(player.first.toString())
+                            .child("role").setValue(player.third.toString());
+                    }
+
                 }
 
-                 */
-
-                // inssert into db and delete Players child
-                // delete Players in db
 
                 //startActivity(new Intent(CreateGameActivity.this, GameActivity.class));
-            }
-        });
-
-
-
-    }
+            });
+        }
 }
