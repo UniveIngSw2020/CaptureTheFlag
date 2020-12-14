@@ -5,6 +5,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +21,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Iterator;
+
 public class JoinGameActivity extends AppCompatActivity {
+
+    boolean isAdded = false;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -35,7 +41,6 @@ public class JoinGameActivity extends AppCompatActivity {
         final Button joinButton = findViewById(R.id.joinbutton);
         final DatabaseReference lobby = new GameDB().getDbRef();
         final StoredDataManager me = new StoredDataManager(JoinGameActivity.this.getFilesDir());
-
 
         // join button event actions
         joinButton.setOnClickListener(new View.OnClickListener() {
@@ -54,17 +59,34 @@ public class JoinGameActivity extends AppCompatActivity {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     if(snapshot.getChildrenCount() < 10){
-                                        // inserting my info in players table in the db
 
+                                        // inserting my info in players table in the db
                                         lobby.child(edit_game.getText().toString()).child("Players")
                                                 .child(me.readID()).setValue(me.readName());
 
-
+                                        isAdded = true;
                                         //players.child(me.readID()).setValue(me.readName());
                                         //write code to perform in db
                                         // if > 10 cannot enter
                                         Toast.makeText(JoinGameActivity.this,  Long.valueOf(snapshot.getChildrenCount()).toString() , Toast.LENGTH_SHORT).show();
                                         wait_start.setText("waiting to start the game...");
+
+                                        // then check if the status changed into "Timer"
+                                        lobby.child(edit_game.getText().toString())
+                                                .child("State").addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                // here's the checker, then start the Timer activity
+                                                if (snapshot.getValue().toString().equals("Timer")){
+                                                    startActivity(new Intent(JoinGameActivity.this, GameActivity.class));
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+
+                                            }
+                                        });
                                     }else{
                                         Toast.makeText(JoinGameActivity.this, "Capienza massima raggiunta", Toast.LENGTH_SHORT)
                                                 .show();
@@ -94,10 +116,6 @@ public class JoinGameActivity extends AppCompatActivity {
                 });
             }
         });
-
-
-
-
 
 
     }
