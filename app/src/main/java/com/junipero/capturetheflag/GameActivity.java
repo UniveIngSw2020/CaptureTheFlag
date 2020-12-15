@@ -1,5 +1,6 @@
 package com.junipero.capturetheflag;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -35,5 +36,15 @@ public class GameActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        Intent i = getIntent();
+        String gameCode = i.getStringExtra("gameCode");
+        String role = i.getStringExtra("role");
+        String team = i.getStringExtra("team");
+
+
+
+
+
     }
 }

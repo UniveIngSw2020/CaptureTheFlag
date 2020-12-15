@@ -31,7 +31,7 @@ public class TimerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_timer);
         final ConstraintLayout layout = findViewById(R.id.timerLayout);
         Intent i = getIntent();
-        String gameCode = i.getStringExtra("gameCode");
+        final String gameCode = i.getStringExtra("gameCode");
 
         TextView gameCodeViewer = findViewById(R.id.GameID);
         gameCodeViewer.setText(gameCode);
@@ -42,9 +42,14 @@ public class TimerActivity extends AppCompatActivity {
         final DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
         final StoredDataManager sdm = new StoredDataManager(TimerActivity.this.getFilesDir());
 
+        // enhance readability over team color's background
         gameCodeViewer.setTextColor(Color.WHITE);
         roleViewer.setTextColor(Color.WHITE);
         timerViewer.setTextColor(Color.WHITE);
+
+        // array containing data of my game (gameCode, my role, my team color)
+        final String[] data = new String[3];
+        data[0] = gameCode;
 
 
 
@@ -59,6 +64,8 @@ public class TimerActivity extends AppCompatActivity {
                         // you are in team RED, and your role is : Keeper
                         roleViewer.setText("Keeper");
                         layout.setBackgroundColor(Color.RED);
+                        data[1] = roleViewer.getText().toString();
+                        data[2] = "Red";
                     }
                 }
                 for (DataSnapshot ds : snapshot.child("Red/Stealer").getChildren()){
@@ -66,6 +73,8 @@ public class TimerActivity extends AppCompatActivity {
                         // you are in team RED, and your role is : Stealer
                         roleViewer.setText("Stealer");
                         layout.setBackgroundColor(Color.RED);
+                        data[1] = roleViewer.getText().toString();
+                        data[2] = "Red";
                     }
                 }
                 for (DataSnapshot ds : snapshot.child("Blue/Keeper").getChildren()){
@@ -73,6 +82,8 @@ public class TimerActivity extends AppCompatActivity {
                         // you are in team BLUE, and your role is : Keeper
                         roleViewer.setText("Keeper");
                         layout.setBackgroundColor(Color.BLUE);
+                        data[1] = roleViewer.getText().toString();
+                        data[2] = "Blue";
                     }
                 }
                 for (DataSnapshot ds : snapshot.child("Blue/Stealer").getChildren()){
@@ -80,6 +91,8 @@ public class TimerActivity extends AppCompatActivity {
                         // you are in team BLUE, and your role is : Stealer
                         roleViewer.setText("Stealer");
                         layout.setBackgroundColor(Color.BLUE);
+                        data[1] = roleViewer.getText().toString();
+                        data[2] = "Blue";
                     }
                 }
 
@@ -102,6 +115,13 @@ public class TimerActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 //timerViewer.setText("Let's start!");
+                // starts the GameActivity after the countdown
+                Intent i = new Intent(TimerActivity.this, GameActivity.class);
+                i.putExtra("gameCode", data[0]);
+                i.putExtra("role", data[1]);
+                i.putExtra("team", data[2]);
+                startActivity(i);
+
             }
         }.start();
 
