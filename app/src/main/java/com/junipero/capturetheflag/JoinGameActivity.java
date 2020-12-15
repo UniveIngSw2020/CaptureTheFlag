@@ -78,7 +78,10 @@ public class JoinGameActivity extends AppCompatActivity {
                                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                                 // here's the checker, then start the Timer activity
                                                 if (snapshot.getValue().toString().equals("Timer")){
-                                                    startActivity(new Intent(JoinGameActivity.this, GameActivity.class));
+                                                    // use timeractivity insted of gameActivity
+                                                    Intent i = new Intent(JoinGameActivity.this, TimerActivity.class);
+                                                    i.putExtra("gameCode", edit_game.getText().toString());
+                                                    startActivity(i);
                                                 }
                                             }
 

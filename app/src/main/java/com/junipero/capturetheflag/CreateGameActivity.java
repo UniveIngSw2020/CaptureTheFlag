@@ -111,7 +111,7 @@ public class CreateGameActivity extends AppCompatActivity {
         });
 
 
-
+        // on click action manage players data to put in the db
         startbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,6 +149,11 @@ public class CreateGameActivity extends AppCompatActivity {
                 lobby.child("State").setValue("Timer");
 
                 // -> timer Activity
+                Intent i = new Intent(CreateGameActivity.this, TimerActivity.class);
+                i.putExtra("gameCode", gameCode);
+                startActivity(i);
+
+
             }
 
                 //startActivity(new Intent(CreateGameActivity.this, GameActivity.class));
