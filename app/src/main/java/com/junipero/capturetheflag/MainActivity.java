@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -36,10 +37,19 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import static android.content.ContentValues.TAG;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener{
 
@@ -51,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private float[] mMagnetometerData = new float[3];
     private Display mDisplay;
     TextView azimuthText;
+    TextView myLocation;
+    GameDB db;
 
     private final String TAG = "MainActivity";
     private final String Myname = "Nasi";
@@ -108,16 +120,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         // ---------------LOCATION UPDATER-----------------
         String latLong;
-        TextView myLocation;
         myLocation = findViewById(R.id.myLocation);
 
 
         checkLocationPermission();
 
         // needed to manage location data (only wrapped things)
-        LocationUpdater locationUpdater = new LocationUpdater(this, myLocation);
+        LocationUpdater locationUpdater = new LocationUpdater(this);
         // set the old location saved by the gps in the textView
-        myLocation.setText(locationUpdater.getActualPosition());
+        //myLocation.setText(locationUpdater.getActualPosition());
+
+        CTFCriteria ctfCriteria = new CTFCriteria();
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        String provider = locationManager.getBestProvider(ctfCriteria, true);
+        Location location = locationManager.getLastKnownLocation(provider);
+        //updateWithNewLocation(location);
+        //activate the updates by the listener
+        locationManager.requestLocationUpdates(provider,
+                1000,
+                0,
+                locationListener);
+
+
 
 
 
@@ -132,23 +156,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         // ----------------- DATABASE MANAGER ---------------------------
 
-        GameDB db = new GameDB();
+        db = new GameDB();
        // db.getDbRef().child("/" + Myname);
         db.getDbRef().child("/test").setValue("Sono IN lalalal ");
 
@@ -156,7 +166,61 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     // ------------------------------ END ON CREATE ---------------------------------------------
 
-    // -----------------------------  -----------------------------------------------------------
+    // ----------------------------------- calc ------------------------------------------------
+
+    private double calculateBearingAngle (double startLatitude, double startLongitude, double endLatitude, double endLongitude){
+        return (endLongitude-startLongitude) / (endLatitude - startLatitude);
+    }
+
+    // -------------------------- location ------------------------------------------------
+
+    private final LocationListener locationListener = new LocationListener()
+    {
+        @SuppressLint("SetTextI18n")
+        @Override
+        public void onLocationChanged(Location location) {
+            if(location != null) {
+                myLocation.setText("lat: " + location.getLatitude() + "\n"
+                        + "long: " + location.getLongitude() + "\n" + location.getAccuracy());
+
+
+                final double [] pos = new double[2];
+
+                db.getDbRef().child("Location").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        pos[0] = Double.parseDouble(String.valueOf(snapshot.child("Latitude").getValue()));
+                        pos[1] = Double.parseDouble(String.valueOf(snapshot.child("Longitude").getValue()));
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+                myLocation.setText("" + calculateBearingAngle(location.getLatitude(), location.getLongitude(),
+                        pos[0], pos[1]));
+
+
+            }
+                //db.getDbRef().child("Location").child("Latitude").setValue(location.getLatitude());
+                //db.getDbRef().child("Location").child("Longitude").setValue(location.getLongitude());
+            }
+
+
+        @Override
+        public void onProviderDisabled(String provider) { }
+
+        @Override
+        public void onProviderEnabled(String provider) { }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) { }
+
+    };
+
+
+    // ----------------------------- AZIMUTH THINGS -----------------------------------------------------------
 
     @Override
     protected void onStart() {

@@ -6,10 +6,12 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import java.util.Calendar;
 import java.util.Date;
 
+import static android.content.ContentValues.TAG;
 
 
 public class LocationUpdater {
@@ -20,13 +22,13 @@ public class LocationUpdater {
     private double accuracy;
     private double degree;
     private String actualPosition = "ciao";
-    private TextView myLocation;
+    //private TextView myLocation;
 
     @SuppressLint("MissingPermission")
-    public LocationUpdater (Context mContext, TextView myLocation) {
+    public LocationUpdater (Context mContext) {
         String context = Context.LOCATION_SERVICE;
         // associated a textview field just for debug
-        this.myLocation = myLocation;
+        //this.myLocation = myLocation;
         // creating Criteria to manage location data required for the game
         CTFCriteria ctfCriteria = new CTFCriteria();
         locationManager = (LocationManager)mContext.getSystemService(context);
@@ -86,7 +88,7 @@ public class LocationUpdater {
         @Override
         public void onLocationChanged(Location location) {
             updateWithNewLocation(location);
-            myLocation.setText(actualPosition);
+            //myLocation.setText(actualPosition);
         }
 
         @Override
@@ -117,6 +119,8 @@ public class LocationUpdater {
                     "\nDEGREE:" + degree + "\n" +
                     // the time is just for debug =)
                     "\n TIME: " + currentTime;
+
+            Log.d(TAG, actualPosition);
         }
     }
 

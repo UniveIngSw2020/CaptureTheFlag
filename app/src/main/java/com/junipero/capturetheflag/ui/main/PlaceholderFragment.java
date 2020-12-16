@@ -115,6 +115,7 @@ public class PlaceholderFragment extends Fragment implements SensorEventListener
 
 
 
+
                 myTeamFlagRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot snapshot) {
@@ -137,8 +138,10 @@ public class PlaceholderFragment extends Fragment implements SensorEventListener
                 mSensorMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
                 azimuthText = view.findViewById(R.id.degreeView);
                 break;
-            case 2:
 
+
+            case 2:
+                // code for CHAT section
                 break;
         }
 
