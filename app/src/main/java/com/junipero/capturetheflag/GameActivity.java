@@ -13,8 +13,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
 import com.junipero.capturetheflag.ui.main.SectionsPagerAdapter;
+
+import org.w3c.dom.Text;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -27,22 +31,22 @@ public class GameActivity extends AppCompatActivity {
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
-        FloatingActionButton fab = findViewById(R.id.fab);
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         Intent i = getIntent();
         String gameCode = i.getStringExtra("gameCode");
         String role = i.getStringExtra("role");
         String team = i.getStringExtra("team");
+        //TextView myLocation = findViewById(R.id....);
+
+        final DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
+        final DatabaseReference myTeamFlagRef = lobby.child(team).child("Keeper");
+        final DatabaseReference otherTeamFlagRef = lobby.child((team.equals("Blue") ? "Red" : "Blue" ))
+                .child("Keeper");
 
 
+
+        //final LocationUpdater myPosition = new LocationUpdater(this, myLocation);
 
 
 

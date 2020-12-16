@@ -121,6 +121,10 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="title_activity_game">GameActivity</string>
-    <string name="tab_text_1">Tab 1</string>
-    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_1">Game</string>
+    <string name="tab_text_2">Chat</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="game_fragment_title">HELLO GAME FRAGGGGMNET</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_chat">Hello CHATfragment</string>
 </resources>

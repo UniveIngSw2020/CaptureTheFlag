@@ -59,6 +59,7 @@ public class TimerActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
+                // save data of your team and role in the game
                 for (DataSnapshot ds : snapshot.child("Red/Keeper").getChildren()){
                     if(ds.getKey().equals(sdm.readID())){
                         // you are in team RED, and your role is : Keeper
@@ -105,7 +106,7 @@ public class TimerActivity extends AppCompatActivity {
         });
 
         // Countdown 1 minute
-        new CountDownTimer(60000, 1000){
+        new CountDownTimer(5000, 1000){
             @SuppressLint("SetTextI18n")
             public void onTick(long millisUntilFinished) {
                 timerViewer.setText("time remaining: \n" + (millisUntilFinished / 1000) + " seconds");
