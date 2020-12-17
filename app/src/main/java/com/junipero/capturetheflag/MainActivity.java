@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +27,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     TextView azimuthText;
     TextView myLocation;
     GameDB db;
+    double azimuthDeg;
 
     private final String TAG = "MainActivity";
     private final String Myname = "Nasi";
@@ -134,26 +137,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         String provider = locationManager.getBestProvider(ctfCriteria, true);
         Location location = locationManager.getLastKnownLocation(provider);
+
+
         //updateWithNewLocation(location);
         //activate the updates by the listener
         locationManager.requestLocationUpdates(provider,
                 1000,
                 0,
                 locationListener);
-
-
-
-
-
-
-
-/*
-        float [] R = new float[9];
-        float [] values = new float[3];
-        SensorManager.getOrientation(R, values);
-        */
-
-
 
 
         // ----------------- DATABASE MANAGER ---------------------------
@@ -168,8 +159,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     // ----------------------------------- calc ------------------------------------------------
 
-    private double calculateBearingAngle (double startLatitude, double startLongitude, double endLatitude, double endLongitude){
-        return (endLongitude-startLongitude) / (endLatitude - startLatitude);
+    private double calculateAngle (double startLat, double startLong, double destLat, double destLong){
+        double x = Math.cos(Math.toRadians(destLat))
+                * Math.sin(Math.toRadians(destLong - startLong));
+
+        double y = Math.cos(Math.toRadians(startLat))
+                * Math.sin(Math.toRadians(destLat))
+                - Math.sin(Math.toRadians(startLat))
+                * Math.cos(Math.toRadians(destLat))
+                * Math.cos(Math.toRadians(destLong - startLong));
+
+        double res = Math.toDegrees(Math.atan2(x, y));
+
+        return (res < 0) ? 360 + res : res;
     }
 
     // -------------------------- location ------------------------------------------------
@@ -178,11 +180,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     {
         @SuppressLint("SetTextI18n")
         @Override
-        public void onLocationChanged(Location location) {
+        public void onLocationChanged(final Location location) {
             if(location != null) {
-                myLocation.setText("lat: " + location.getLatitude() + "\n"
-                        + "long: " + location.getLongitude() + "\n" + location.getAccuracy());
-
 
                 final double [] pos = new double[2];
 
@@ -191,6 +190,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         pos[0] = Double.parseDouble(String.valueOf(snapshot.child("Latitude").getValue()));
                         pos[1] = Double.parseDouble(String.valueOf(snapshot.child("Longitude").getValue()));
+
+                        // set to test location
+                        //location.setLatitude(45.489439);
+                        //location.setLongitude(12.208766);
+
+                        double angleFromFlag = calculateAngle(location.getLatitude(), location.getLongitude(), pos[0], pos[1]);
+                        double formula = (angleFromFlag - azimuthDeg + 360) % 360;
+                        azimuthText.setText(formula + "");
+                        myLocation.setText("my position: " + location.getLatitude() + "  " + location.getLongitude() +
+                                "\nflag position: " + pos[0] + "  " + pos[1] +
+                                "\nangle: " + angleFromFlag);
                     }
 
                     @Override
@@ -198,14 +208,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
                     }
                 });
-                myLocation.setText("" + calculateBearingAngle(location.getLatitude(), location.getLongitude(),
-                        pos[0], pos[1]));
-
 
             }
-                //db.getDbRef().child("Location").child("Latitude").setValue(location.getLatitude());
-                //db.getDbRef().child("Location").child("Longitude").setValue(location.getLongitude());
-            }
+        }
 
 
         @Override
@@ -288,16 +293,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
 
         // Pull out the individual values from the array.
-        float azimuth = orientationValues[0];
-        float pitch = orientationValues[1];
-        float roll = orientationValues[2];
+        double azimuth = orientationValues[0];
 
-
-        // Fill in the string placeholders and set the textview text.
-        // Fill in the string placeholders and set the textview text.
         //azimuth = (azimuth + 0 + 360) % 360;
         azimuth = (azimuth < 0) ? (float) (2 * Math.PI + azimuth) : azimuth;
-        azimuthText.setText(Math.toDegrees(azimuth) + "");
+        azimuth = Math.toDegrees(azimuth);
+        azimuthDeg = azimuth;
+        //azimuthText.setText(azimuth + "");
 
     }
 

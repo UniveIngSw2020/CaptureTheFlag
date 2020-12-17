@@ -120,7 +120,7 @@ public class LocationUpdater {
                     // the time is just for debug =)
                     "\n TIME: " + currentTime;
 
-            Log.d(TAG, actualPosition);
+            //Log.d(TAG, actualPosition);
         }
     }
 
