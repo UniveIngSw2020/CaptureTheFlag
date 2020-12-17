@@ -1,12 +1,18 @@
 package com.junipero.capturetheflag.ui.main;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +21,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -23,8 +30,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.junipero.capturetheflag.CTFCriteria;
 import com.junipero.capturetheflag.GameDB;
 import com.junipero.capturetheflag.LocationUpdater;
+import com.junipero.capturetheflag.MainActivity;
 import com.junipero.capturetheflag.R;
 
 import static androidx.core.content.ContextCompat.getSystemService;
@@ -38,9 +47,12 @@ public class PlaceholderFragment extends Fragment implements SensorEventListener
     Sensor mSensorAccelerometer;
     Sensor mSensorMagnetometer;
 
+
     private float[] mAccelerometerData = new float[3];
     private float[] mMagnetometerData = new float[3];
     TextView azimuthText;
+    GameDB db;
+    double azimuthDeg;
 
     private static final String ARG_SECTION_NUMBER = "section_number";
 
@@ -111,32 +123,40 @@ public class PlaceholderFragment extends Fragment implements SensorEventListener
                 final DatabaseReference myTeamFlagRef = lobby.child(team).child("Keeper");
                 final DatabaseReference otherTeamFlagRef = lobby.child((team.equals("Blue") ? "Red" : "Blue" ))
                         .child("Keeper");
-                //final LocationUpdater myPosition = new LocationUpdater(this.getContext());
 
-
-
-
-                myTeamFlagRef.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot snapshot) {
-                        //angles[0] = calculateBearingAngle(myPosition.getLatitude(), myPosition.getLongitude(), (double) snapshot.child("Latitude").getValue(), (double) snapshot.child("Longitude").getValue());
-                        //lobby.child("Location").child("Latitude").setValue(myPosition.getLatitude());
-                       // lobby.child("Location").child("Longitude").setValue(myPosition.getLongitude());
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
                 TextView degreeFromOtherView = view.findViewById(R.id.degreeFromOther);
                 TextView degreeFromMyTeamFlagView = view.findViewById(R.id.degreeFromMyTeam);
                 TextView distanceFromOtherView = view.findViewById(R.id.distanceFromOther);
                 TextView distanceFromMyTeamFlagView = view.findViewById(R.id.distanceFromMyFlag);
-                mSensorManager = (SensorManager) this.getActivity().getSystemService(Activity.SENSOR_SERVICE);
-                mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-                mSensorMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-                azimuthText = view.findViewById(R.id.degreeView);
+
+                checkLocationPermission();
+
+
+                CTFCriteria ctfCriteria = new CTFCriteria();
+                LocationManager locationManager = (LocationManager) this.getActivity()
+                        .getSystemService(Activity.LOCATION_SERVICE);
+                String provider = locationManager.getBestProvider(ctfCriteria, true);
+                Location location = locationManager.getLastKnownLocation(provider);
+                db = new GameDB();
+
+                //updateWithNewLocation(location);
+                //activate the updates by the listener
+                locationManager.requestLocationUpdates(provider,
+                        1000,
+                        0,
+                        locationListener);
+
+                if(role.equals("Stealer")){
+                    mSensorManager = (SensorManager) this.getActivity()
+                            .getSystemService(Activity.SENSOR_SERVICE);
+                    mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+                    mSensorMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+                    azimuthText = view.findViewById(R.id.degreeView);
+                }
+
+
+
+
                 break;
 
 
@@ -147,6 +167,70 @@ public class PlaceholderFragment extends Fragment implements SensorEventListener
 
 
     }
+
+    // ----------------------------------- calc ------------------------------------------------
+
+    private double calculateAngle (double startLat, double startLong, double destLat, double destLong){
+        double x = Math.cos(Math.toRadians(destLat))
+                * Math.sin(Math.toRadians(destLong - startLong));
+
+        double y = Math.cos(Math.toRadians(startLat))
+                * Math.sin(Math.toRadians(destLat))
+                - Math.sin(Math.toRadians(startLat))
+                * Math.cos(Math.toRadians(destLat))
+                * Math.cos(Math.toRadians(destLong - startLong));
+
+        double res = Math.toDegrees(Math.atan2(x, y));
+
+        return (res < 0) ? 360 + res : res;
+    }
+
+    // -------------------------- location ------------------------------------------------
+
+    private final LocationListener locationListener = new LocationListener()
+    {
+        @SuppressLint("SetTextI18n")
+        @Override
+        public void onLocationChanged(final Location location) {
+            if(location != null) {
+
+                final double [] pos = new double[2];
+
+                db.getDbRef().child("Location").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        pos[0] = Double.parseDouble(String.valueOf(snapshot.child("Latitude").getValue()));
+                        pos[1] = Double.parseDouble(String.valueOf(snapshot.child("Longitude").getValue()));
+
+                        // set to test location
+                        //location.setLatitude(45.489439);
+                        //location.setLongitude(12.208766);
+
+                        double angleFromFlag = calculateAngle(location.getLatitude(), location.getLongitude(), pos[0], pos[1]);
+                        double formula = (angleFromFlag - azimuthDeg + 360) % 360;
+                        azimuthText.setText(formula + "");
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+            }
+        }
+
+
+        @Override
+        public void onProviderDisabled(String provider) { }
+
+        @Override
+        public void onProviderEnabled(String provider) { }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) { }
+
+    };
 
     @Override
     public void onStart() {
@@ -214,13 +298,13 @@ public class PlaceholderFragment extends Fragment implements SensorEventListener
         }
 
         // Pull out the individual values from the array.
-        float azimuth = orientationValues[0];
+        double azimuth = orientationValues[0];
 
 
-        // Fill in the string placeholders and set the textview text.
         //azimuth = (azimuth + 0 + 360) % 360;
         azimuth = (azimuth < 0) ? (float) (2 * Math.PI + azimuth) : azimuth;
-        azimuthText.setText(Math.toDegrees(azimuth) + "");
+        azimuth = Math.toDegrees(azimuth);
+        azimuthDeg = azimuth;
 
 
     }
@@ -231,5 +315,14 @@ public class PlaceholderFragment extends Fragment implements SensorEventListener
      */
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
+    }
+
+    // --------------------------- PERMISSION CHECKER ---------------------------------------------
+    private void checkLocationPermission(){
+        if (ActivityCompat.checkSelfPermission(this.getActivity()
+                , Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this.getActivity()
+                    , new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 44);
+        }
     }
 }
