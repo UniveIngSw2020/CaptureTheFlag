@@ -49,6 +49,11 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
     DatabaseReference myTeamFlagRef;
     DatabaseReference otherTeamFlagRef;
 
+    TextView degreeFromOtherView;
+    TextView degreeFromMyTeamFlagView;
+    TextView distanceFromOtherView;
+    TextView distanceFromMyTeamFlagView;
+
     // just create the view, don't use it to initialize or execute your code
     // use onViewCreated instead :)
     @Override
@@ -76,10 +81,10 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         otherTeamFlagRef = lobby.child((team.equals("Blue") ? "Red" : "Blue" )).child("Keeper");
         azimuthText = view.findViewById(R.id.degreeView);
 
-        TextView degreeFromOtherView = view.findViewById(R.id.degreeFromOther);
-        TextView degreeFromMyTeamFlagView = view.findViewById(R.id.degreeFromMyTeam);
-        TextView distanceFromOtherView = view.findViewById(R.id.distanceFromOther);
-        TextView distanceFromMyTeamFlagView = view.findViewById(R.id.distanceFromMyFlag);
+        degreeFromOtherView = view.findViewById(R.id.degreeFromOther);
+        degreeFromMyTeamFlagView = view.findViewById(R.id.degreeFromMyTeam);
+        distanceFromOtherView = view.findViewById(R.id.distanceFromOther);
+        distanceFromMyTeamFlagView = view.findViewById(R.id.distanceFromMyFlag);
 
         checkLocationPermission();
 
@@ -131,6 +136,24 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         return (res < 0) ? 360 + res : res;
     }
 
+    // Haversine formula
+    private long calculateDistance (double startLat, double startLong, double destLat, double destLong) {
+
+        double R = 6371; // Radius of the earth in km
+        double dLat = Math.toRadians(destLat - startLat);
+        double dLon = Math.toRadians(destLong - startLong);
+        double a =
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                        Math.cos(Math.toRadians(startLat)) * Math.cos(Math.toRadians(destLat)) *
+                                Math.sin(dLon/2) * Math.sin(dLon/2)
+                ;
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double res = R * c; // Distance in km
+
+        return Math.round(res*1000);
+    }
+
     // -------------------------- location ------------------------------------------------
 
     private final LocationListener locationListener = new LocationListener()
@@ -149,13 +172,12 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                             pos[0] = Double.parseDouble(String.valueOf(snapshot.child("Latitude").getValue()));
                             pos[1] = Double.parseDouble(String.valueOf(snapshot.child("Longitude").getValue()));
 
-                            // set to test location
-                            //location.setLatitude(45.489439);
-                            //location.setLongitude(12.208766);
-
                             double angleFromFlag = calculateAngle(location.getLatitude(), location.getLongitude(), pos[0], pos[1]);
-                            double formula = (angleFromFlag - azimuthDeg + 360) % 360;
+                            double formula = Math.floor(((angleFromFlag - azimuthDeg + 360) % 360) * 100) /100;
                             azimuthText.setText(formula + "");
+                            distanceFromOtherView.setText(calculateDistance(location.getLatitude(),
+                                    location.getLongitude(), pos[0], pos[1]) + "");
+
                         }
 
                         @Override
