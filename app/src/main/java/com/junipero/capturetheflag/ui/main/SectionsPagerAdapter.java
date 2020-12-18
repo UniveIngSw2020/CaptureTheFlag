@@ -29,7 +29,16 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
-        return PlaceholderFragment.newInstance(position + 1);
+        //return PlaceholderFragment.newInstance(position + 1);
+        switch(position){
+            case 0:
+                TabGameActivity tabGame = new TabGameActivity();
+                return tabGame;
+            case 1:
+                TabChatActivity tabChat = new TabChatActivity();
+                return tabChat;
+        }
+        return null;
     }
 
     @Nullable
