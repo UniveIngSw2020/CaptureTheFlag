@@ -15,26 +15,36 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:screenOrientation="portrait"
         tools:ignore="AllowBackup">
-        <activity android:name=".TimerActivity"></activity>
+        <activity
+            android:name=".TimerActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".GameActivity"
             android:label="@string/title_activity_game"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".OptionsActivity" />
-        <activity android:name=".CreateUserActivity" />
-        <activity android:name=".JoinGameActivity" />
-        <activity android:name=".CreateGameActivity" />
+        <activity android:name=".OptionsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".CreateUserActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".JoinGameActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".CreateGameActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".SplashActivity"
-            android:theme="@style/SplashTheme">
+            android:theme="@style/SplashTheme"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

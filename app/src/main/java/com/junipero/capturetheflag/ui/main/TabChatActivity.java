@@ -19,17 +19,15 @@ public class TabChatActivity extends Fragment {
         View root = null;
         root = inflater.inflate(R.layout.fragment_chat, container, false);
 
-
-        /*
-
-        pageViewModel.getText().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                //textView.setText(s);
-            }
-        });
-
-         */
         return root;
+    }
+
+    // put your code in onViewCreated, it is called after onCreateView
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // put your code here ¯\_(ツ)_/¯
+
     }
 }

@@ -137,12 +137,7 @@ public class CreateGameActivity extends AppCompatActivity {
                     lobby.child(player.fourth.toString())
                             .child(player.third.toString())
                             .child(player.first.toString())
-                            .child("Name").setValue(player.second.toString());
-                    // adding the role of player into his opportune location in db
-                    lobby.child(player.fourth.toString())
-                            .child(player.third.toString())
-                            .child(player.first.toString())
-                            .child("Role").setValue(player.third.toString());
+                            .setValue(player.second.toString());
                 }
 
                 // set State of current game in "Timer"

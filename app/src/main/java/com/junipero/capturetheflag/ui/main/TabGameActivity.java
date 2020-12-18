@@ -35,14 +35,22 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
     private SensorManager mSensorManager;
     Sensor mSensorAccelerometer;
     Sensor mSensorMagnetometer;
-
-
     private float[] mAccelerometerData = new float[3];
     private float[] mMagnetometerData = new float[3];
     TextView azimuthText;
     GameDB db;
     double azimuthDeg;
+    Intent i;
+    String gameCode;
+    String role;
+    String team;
 
+    DatabaseReference lobby;
+    DatabaseReference myTeamFlagRef;
+    DatabaseReference otherTeamFlagRef;
+
+    // just create the view, don't use it to initialize or execute your code
+    // use onViewCreated instead :)
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
@@ -53,20 +61,20 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         return root;
     }
 
+    // put your code in onViewCreated, it is called after onCreateView
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         // code for GAME section
-        Intent i = this.getActivity().getIntent();
-        String gameCode = i.getStringExtra("gameCode");
-        String role = i.getStringExtra("role");
-        String team = i.getStringExtra("team");
-
-        final DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
-        final DatabaseReference myTeamFlagRef = lobby.child(team).child("Keeper");
-        final DatabaseReference otherTeamFlagRef = lobby.child((team.equals("Blue") ? "Red" : "Blue" ))
-                .child("Keeper");
+        i = this.getActivity().getIntent();
+        gameCode = i.getStringExtra("gameCode");
+        role = i.getStringExtra("role");
+        team = i.getStringExtra("team");
+        lobby = new GameDB().getDbRef().child(gameCode);
+        myTeamFlagRef = lobby.child(team).child("Keeper");
+        otherTeamFlagRef = lobby.child((team.equals("Blue") ? "Red" : "Blue" )).child("Keeper");
+        azimuthText = view.findViewById(R.id.degreeView);
 
         TextView degreeFromOtherView = view.findViewById(R.id.degreeFromOther);
         TextView degreeFromMyTeamFlagView = view.findViewById(R.id.degreeFromMyTeam);
@@ -90,17 +98,24 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                 0,
                 locationListener);
 
-        //if(role.equals("Stealer")){
+        if(role.equals("Stealer")){
             mSensorManager = (SensorManager) this.getActivity()
                     .getSystemService(Activity.SENSOR_SERVICE);
             mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             mSensorMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-            azimuthText = view.findViewById(R.id.degreeView);
-        //}
+
+            degreeFromOtherView.setText("degree from other");
+            degreeFromMyTeamFlagView.setText("degree from my");
+            distanceFromOtherView.setText("distance from other");
+            distanceFromMyTeamFlagView.setText("distance from other");
+        }
     }
 
     // ------------------------------- calculate angle -----------------------------------------
-
+    /*
+     * very thanks to IGISMap:
+     *https://www.igismap.com/formula-to-find-bearing-or-heading-angle-between-two-points-latitude-longitude/
+    */
     private double calculateAngle (double startLat, double startLong, double destLat, double destLong){
         double x = Math.cos(Math.toRadians(destLat))
                 * Math.sin(Math.toRadians(destLong - startLong));
@@ -125,28 +140,33 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         public void onLocationChanged(final Location location) {
             if(location != null) {
 
-                final double [] pos = new double[2];
+                if (role.equals("Stealer")) {
+                    final double[] pos = new double[2];
 
-                db.getDbRef().child("Location").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        pos[0] = Double.parseDouble(String.valueOf(snapshot.child("Latitude").getValue()));
-                        pos[1] = Double.parseDouble(String.valueOf(snapshot.child("Longitude").getValue()));
+                    db.getDbRef().child("Location").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            pos[0] = Double.parseDouble(String.valueOf(snapshot.child("Latitude").getValue()));
+                            pos[1] = Double.parseDouble(String.valueOf(snapshot.child("Longitude").getValue()));
 
-                        // set to test location
-                        //location.setLatitude(45.489439);
-                        //location.setLongitude(12.208766);
+                            // set to test location
+                            //location.setLatitude(45.489439);
+                            //location.setLongitude(12.208766);
 
-                        double angleFromFlag = calculateAngle(location.getLatitude(), location.getLongitude(), pos[0], pos[1]);
-                        double formula = (angleFromFlag - azimuthDeg + 360) % 360;
-                        azimuthText.setText(formula + "");
-                    }
+                            double angleFromFlag = calculateAngle(location.getLatitude(), location.getLongitude(), pos[0], pos[1]);
+                            double formula = (angleFromFlag - azimuthDeg + 360) % 360;
+                            azimuthText.setText(formula + "");
+                        }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
 
-                    }
-                });
+                        }
+                    });
+                } else if (role.equals("Keeper")) {
+                    myTeamFlagRef.child("Location").child("Latitude").setValue(location.getLatitude());
+                    myTeamFlagRef.child("Location").child("Longitude").setValue(location.getLongitude());
+                }
 
             }
         }
@@ -236,8 +256,6 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         azimuth = (azimuth < 0) ? (float) (2 * Math.PI + azimuth) : azimuth;
         azimuth = Math.toDegrees(azimuth);
         azimuthDeg = azimuth;
-
-
     }
 
     /**
