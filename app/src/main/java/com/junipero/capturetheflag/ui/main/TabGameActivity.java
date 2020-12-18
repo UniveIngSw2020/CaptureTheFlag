@@ -54,6 +54,8 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
     TextView distanceFromOtherView;
     TextView distanceFromMyTeamFlagView;
 
+    double angleFromFlag;
+
     // just create the view, don't use it to initialize or execute your code
     // use onViewCreated instead :)
     @Override
@@ -172,11 +174,32 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                             pos[0] = Double.parseDouble(String.valueOf(snapshot.child("Latitude").getValue()));
                             pos[1] = Double.parseDouble(String.valueOf(snapshot.child("Longitude").getValue()));
 
-                            double angleFromFlag = calculateAngle(location.getLatitude(), location.getLongitude(), pos[0], pos[1]);
+                            angleFromFlag = calculateAngle(location.getLatitude(), location.getLongitude(), pos[0], pos[1]);
+                            /*
                             double formula = Math.floor(((angleFromFlag - azimuthDeg + 360) % 360) * 100) /100;
                             azimuthText.setText(formula + "");
-                            distanceFromOtherView.setText(calculateDistance(location.getLatitude(),
-                                    location.getLongitude(), pos[0], pos[1]) + "");
+                             */
+                            long distanceFromOtherFlag = calculateDistance(location.getLatitude(),
+                                    location.getLongitude(), pos[0], pos[1]);
+                            distanceFromOtherView.setText(distanceFromOtherFlag + "");
+
+
+
+                            // check if actual distance from opposite team's flag is near to me
+                            if (distanceFromOtherFlag < 5) {
+                                // if (status is : "other COLOR wins"
+                                //  -> ties +1 for everyone
+
+                                // if (status is : "running"
+                                //  -> myCOLOR wins
+                                //  -> wait 5sec    -> if still "myCOLOR wins" -> wins +1 for my team
+                                //                                              -> otherCOLOR losts +1
+
+
+                                // then swith to ScoreActivity
+                                // status game changed
+                                // team color win
+                            }
 
                         }
 
@@ -193,6 +216,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
             }
         }
 
+        // ---------------------------------------------------------------------------------------
 
         @Override
         public void onProviderDisabled(String provider) { }
@@ -234,6 +258,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         mSensorManager.unregisterListener(this);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         // The sensor type (as defined in the Sensor class).
@@ -278,6 +303,11 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         azimuth = (azimuth < 0) ? (float) (2 * Math.PI + azimuth) : azimuth;
         azimuth = Math.toDegrees(azimuth);
         azimuthDeg = azimuth;
+
+        // set the textView update in real time for every movement of the device
+        double formula = Math.floor(((angleFromFlag - azimuthDeg + 360) % 360) * 100) /100;
+        azimuthText.setText(formula + "");
+
     }
 
     /**
