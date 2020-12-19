@@ -13,10 +13,11 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:screenOrientation="portrait"
         tools:ignore="AllowBackup">
+        <activity android:name=".ScoreActivity"></activity>
         <activity
             android:name=".TimerActivity"
             android:screenOrientation="portrait" />
@@ -25,26 +26,31 @@
             android:label="@string/title_activity_game"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".OptionsActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".CreateUserActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".JoinGameActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".CreateGameActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".OptionsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".CreateUserActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".JoinGameActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".CreateGameActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".SplashActivity"
-            android:theme="@style/SplashTheme"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
