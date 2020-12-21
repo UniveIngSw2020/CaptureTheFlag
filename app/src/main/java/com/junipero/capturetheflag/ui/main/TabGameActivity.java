@@ -27,8 +27,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.junipero.capturetheflag.CTFCriteria;
+import com.junipero.capturetheflag.CreateGameActivity;
 import com.junipero.capturetheflag.GameDB;
 import com.junipero.capturetheflag.R;
+import com.junipero.capturetheflag.ScoreActivity;
+import com.junipero.capturetheflag.TimerActivity;
 
 public class TabGameActivity extends Fragment implements SensorEventListener {
 
@@ -44,6 +47,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
     String gameCode;
     String role;
     String team;
+    String otherTeam;
 
     DatabaseReference lobby;
     DatabaseReference myTeamFlagRef;
@@ -69,6 +73,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
     }
 
     // put your code in onViewCreated, it is called after onCreateView
+    @SuppressLint("SetTextI18n")
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -78,9 +83,10 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         gameCode = i.getStringExtra("gameCode");
         role = i.getStringExtra("role");
         team = i.getStringExtra("team");
+        otherTeam = (team.equals("Blue") ? "Red" : "Blue" );
         lobby = new GameDB().getDbRef().child(gameCode);
         myTeamFlagRef = lobby.child(team).child("Keeper");
-        otherTeamFlagRef = lobby.child((team.equals("Blue") ? "Red" : "Blue" )).child("Keeper");
+        otherTeamFlagRef = lobby.child(otherTeam).child("Keeper");
         azimuthText = view.findViewById(R.id.degreeView);
 
         degreeFromOtherView = view.findViewById(R.id.degreeFromOther);
@@ -184,21 +190,24 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                             distanceFromOtherView.setText(distanceFromOtherFlag + "");
 
 
+                            if(snapshot.child("State").getValue().toString().equals("End")){
+                                endGame(snapshot.child("Score").getValue().toString());
 
+                            }
                             // check if actual distance from opposite team's flag is near to me
                             if (distanceFromOtherFlag < 5) {
-                                // if (status is : "other COLOR wins"
-                                //  -> ties +1 for everyone
-
-                                // if (status is : "running"
-                                //  -> myCOLOR wins
-                                //  -> wait 5sec    -> if still "myCOLOR wins" -> wins +1 for my team
-                                //                                              -> otherCOLOR losts +1
-
-
-                                // then swith to ScoreActivity
-                                // status game changed
-                                // team color win
+                                String status = snapshot.child("State").getValue().toString();
+                                if(status.equals(otherTeam + " is winning")){
+                                    db.getDbRef().child(gameCode).child("State").setValue("End");
+                                    db.getDbRef().child(gameCode).child("Score").setValue("Tie");
+                                    endGame("Tie");
+                                } else if (status.equals(team + " is winning")){
+                                    db.getDbRef().child(gameCode).child("State").setValue("End");
+                                    db.getDbRef().child(gameCode).child("Score").setValue(team + " wins");
+                                    endGame(team + " wins");
+                                } else {
+                                    db.getDbRef().child(gameCode).child("State").setValue(team + " is winning");
+                                }
                             }
 
                         }
@@ -211,6 +220,21 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                 } else if (role.equals("Keeper")) {
                     myTeamFlagRef.child("Location").child("Latitude").setValue(location.getLatitude());
                     myTeamFlagRef.child("Location").child("Longitude").setValue(location.getLongitude());
+
+                    db.getDbRef().child("State").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if(snapshot.child("State").getValue().toString().equals("End")){
+                                endGame(snapshot.child("Score").getValue().toString());
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
                 }
 
             }
@@ -326,4 +350,15 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                     , new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 44);
         }
     }
+
+    //---------------------------------------- END --------------------------------------------------
+
+    private void endGame(String score){
+        Intent i = new Intent(this.getActivity(), ScoreActivity.class);
+        i.putExtra("score", score);
+        i.putExtra("team", team);
+        startActivity(i);
+    }
+
+    //------------------------------------------------------------------------------------------
 }
