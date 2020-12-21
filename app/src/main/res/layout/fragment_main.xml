@@ -65,4 +65,30 @@
         app:layout_constraintTop_toBottomOf="@+id/distanceFromMyFlag"
         app:layout_constraintVertical_bias="0.1" />
 
+    <ImageView
+        android:id="@+id/compassLeft"
+        android:layout_width="126dp"
+        android:layout_height="126dp"
+        android:contentDescription="blue arrow"
+        android:src="@drawable/arrow_blue"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.168"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.753" />
+
+    <ImageView
+        android:id="@+id/compassRight"
+        android:layout_width="126dp"
+        android:layout_height="126dp"
+        android:contentDescription="red arrow"
+        android:src="@drawable/arrow_red"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.838"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.753" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

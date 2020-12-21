@@ -96,7 +96,8 @@ public class CreateGameActivity extends AppCompatActivity {
                 }else{
                     // get all players as <String, String> (key: ID, value: Name) then adding to an ArrayList
                     for(DataSnapshot child: snapshot.getChildren()){
-                        players_list.add(new Pair<String, String>(child.getKey(), child.getValue().toString()));
+                        players_list.add(new Pair<String, String>(child.getKey(),
+                                child.getValue().toString()));
                     }
                     startbutton.setEnabled(true);
                 }
@@ -114,7 +115,8 @@ public class CreateGameActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // declaration of the final arrayList with team and role for each player
-                ArrayList<Quadruple<String, String, String, String>> final_players_list = new ArrayList<>(players_list.size());
+                ArrayList<Quadruple<String, String, String, String>> final_players_list =
+                        new ArrayList<>(players_list.size());
                 Collections.shuffle(players_list);
 
                 // shunt algorithm
@@ -128,7 +130,10 @@ public class CreateGameActivity extends AppCompatActivity {
                             - third: role in the game in his team
                             - fourth: his team color
                     */
-                    final_players_list.add(new Quadruple<>(players_list.get(i).first, players_list.get(i).second, role, team));
+                    final_players_list.add(new Quadruple<>(players_list.get(i).first,
+                            players_list.get(i).second,
+                            role,
+                            team));
                 }
 
                 // inssert into db and delete Players child

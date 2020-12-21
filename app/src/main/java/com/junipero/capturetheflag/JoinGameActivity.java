@@ -103,7 +103,7 @@ public class JoinGameActivity extends AppCompatActivity {
 
                         }else{
                             //
-                            Toast.makeText(JoinGameActivity.this, "Room not found ¯\\_(ツ)_//¯", Toast.LENGTH_SHORT)
+                            Toast.makeText(JoinGameActivity.this, "Room not found ¯\\_(ツ)_/¯", Toast.LENGTH_SHORT)
                                     .show();
                             // the join button will be available for next code of lobby
                         }

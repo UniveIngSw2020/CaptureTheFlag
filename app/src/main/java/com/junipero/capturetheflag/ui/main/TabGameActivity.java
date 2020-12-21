@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -58,6 +59,8 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
     TextView distanceFromOtherView;
     TextView distanceFromMyTeamFlagView;
 
+    ImageView compassLeft, compassRight;
+
     double angleFromOtherFlag;
     double angleFromMyFlag;
 
@@ -98,6 +101,8 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         degreeFromMyTeamFlagView = view.findViewById(R.id.degreeFromMyTeam);
         distanceFromOtherView = view.findViewById(R.id.distanceFromOther);
         distanceFromMyTeamFlagView = view.findViewById(R.id.distanceFromMyFlag);
+        compassLeft = view.findViewById(R.id.compassLeft);  // blue as default
+        compassRight = view.findViewById(R.id.compassRight);    // red as default
 
         checkLocationPermission();
 
@@ -122,9 +127,24 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
             mSensorMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
             degreeFromOtherView.setText("degree from other");
+            degreeFromOtherView.setVisibility(View.INVISIBLE);
             degreeFromMyTeamFlagView.setText("degree from my");
+            degreeFromMyTeamFlagView.setVisibility(View.INVISIBLE);
+
+            // update compass colors if my team is Blue
+            // default compasses are left:blue and right:red
+            // left used always for other team's flag
+            if (team.equals("Blue")){
+                compassRight.setImageResource(R.drawable.arrow_blue);
+                compassLeft.setImageResource(R.drawable.arrow_red);
+            }
+
+
             distanceFromOtherView.setText("distance from other");
             distanceFromMyTeamFlagView.setText("distance from other");
+        } else {
+            compassLeft.setVisibility(View.INVISIBLE);
+            compassRight.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -362,10 +382,18 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         azimuthDeg = azimuth;
 
         // set the textView update in real time for every movement of the device
+        // Math.floor needed to round numbers into 2 decimals number after dot
         double formula = Math.floor(((angleFromOtherFlag - azimuthDeg + 360) % 360) * 100) /100;
         double formula2 = Math.floor(((angleFromMyFlag - azimuthDeg + 360) % 360) * 100) /100;
-        degreeFromOtherView.setText(formula + "");
-        degreeFromMyTeamFlagView.setText(formula2 + "");
+
+        // need to update instead ov an ImageView containing the arrows
+        //degreeFromOtherView.setText(formula + "");
+        //degreeFromMyTeamFlagView.setText(formula2 + "");
+
+        // update rotation of compasses in real time
+        compassLeft.setRotation(Double.valueOf(formula).floatValue());
+        compassRight.setRotation(Double.valueOf(formula2).floatValue());
+
 
     }
 
@@ -378,6 +406,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
     }
 
     // --------------------------- PERMISSION CHECKER ---------------------------------------------
+
     private void checkLocationPermission(){
         if (ActivityCompat.checkSelfPermission(this.getActivity()
                 , Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
@@ -392,6 +421,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         Intent i = new Intent(this.getActivity(), ScoreActivity.class);
         i.putExtra("score", score);
         i.putExtra("team", team);
+        i.putExtra("gameCode", gameCode);
         startActivity(i);
     }
 
