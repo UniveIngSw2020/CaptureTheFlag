@@ -49,7 +49,7 @@ public class CreateGameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_game);
 
         TextView test = findViewById(R.id.creategametv);
-        test.setText("SONO NELLA CREATE GAME");
+        test.setText("CREATE GAME");
 
         final Button startbutton = findViewById(R.id.startbutton);
         final ArrayList<Pair<String, String>> players_list = new ArrayList<>();
@@ -63,10 +63,8 @@ public class CreateGameActivity extends AppCompatActivity {
         */
 
         /* DEBUG room */
-
         final String gameCode = "abcd";
         gameId.setText(gameCode);
-
 
         // get my data in a StoredDataManager object
         StoredDataManager me = new StoredDataManager(CreateGameActivity.this.getFilesDir());
@@ -96,7 +94,7 @@ public class CreateGameActivity extends AppCompatActivity {
                 if(snapshot.getChildrenCount() < 4 ){
                     startbutton.setEnabled(false);
                 }else{
-                    // get all players as <String, String> (key, value) then adding to an ArrayList
+                    // get all players as <String, String> (key: ID, value: Name) then adding to an ArrayList
                     for(DataSnapshot child: snapshot.getChildren()){
                         players_list.add(new Pair<String, String>(child.getKey(), child.getValue().toString()));
                     }
@@ -123,6 +121,13 @@ public class CreateGameActivity extends AppCompatActivity {
                 for(int i = 0; i < players_list.size(); i++){
                     String team = (i % 2 == 0) ? "Red" : "Blue";
                     String role = (i < 2) ? "Keeper" : "Stealer";
+                    /*
+                        Quadruple item contains:
+                            - first: Id of player
+                            - second: Name of player
+                            - third: role in the game in his team
+                            - fourth: his team color
+                    */
                     final_players_list.add(new Quadruple<>(players_list.get(i).first, players_list.get(i).second, role, team));
                 }
 
@@ -140,7 +145,7 @@ public class CreateGameActivity extends AppCompatActivity {
                             .setValue(player.second.toString());
                 }
 
-                // set State of current game in "Timer"
+                // set State of current game in "Timer" after shunting
                 lobby.child("State").setValue("Timer");
 
                 // -> timer Activity
@@ -150,8 +155,6 @@ public class CreateGameActivity extends AppCompatActivity {
 
 
             }
-
-                //startActivity(new Intent(CreateGameActivity.this, GameActivity.class));
-            });
+        });
         }
 }

@@ -58,7 +58,8 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
     TextView distanceFromOtherView;
     TextView distanceFromMyTeamFlagView;
 
-    double angleFromFlag;
+    double angleFromOtherFlag;
+    double angleFromMyFlag;
 
     // just create the view, don't use it to initialize or execute your code
     // use onViewCreated instead :)
@@ -79,16 +80,20 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         super.onViewCreated(view, savedInstanceState);
 
         // code for GAME section
+        // get all datas from previous activity
         i = this.getActivity().getIntent();
         gameCode = i.getStringExtra("gameCode");
         role = i.getStringExtra("role");
         team = i.getStringExtra("team");
+        // initialization of other resusable vars
         otherTeam = (team.equals("Blue") ? "Red" : "Blue" );
         lobby = new GameDB().getDbRef().child(gameCode);
+        // initialization of db references of flags in game
         myTeamFlagRef = lobby.child(team).child("Keeper");
         otherTeamFlagRef = lobby.child(otherTeam).child("Keeper");
-        azimuthText = view.findViewById(R.id.degreeView);
 
+        // initializing some views
+        azimuthText = view.findViewById(R.id.degreeView);
         degreeFromOtherView = view.findViewById(R.id.degreeFromOther);
         degreeFromMyTeamFlagView = view.findViewById(R.id.degreeFromMyTeam);
         distanceFromOtherView = view.findViewById(R.id.distanceFromOther);
@@ -104,8 +109,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         Location location = locationManager.getLastKnownLocation(provider);
         db = new GameDB();
 
-        //updateWithNewLocation(location);
-        //activate the updates by the listener
+        //activate the updates by the LocationListener
         locationManager.requestLocationUpdates(provider,
                 1000,
                 0,
@@ -145,20 +149,22 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
     }
 
     // Haversine formula
-    private long calculateDistance (double startLat, double startLong, double destLat, double destLong) {
+    private long calculateDistance (double startLat, double startLong,
+                                    double destLat, double destLong) {
 
         double R = 6371; // Radius of the earth in km
         double dLat = Math.toRadians(destLat - startLat);
         double dLon = Math.toRadians(destLong - startLong);
-        double a =
-                Math.sin(dLat/2) * Math.sin(dLat/2) +
-                        Math.cos(Math.toRadians(startLat)) * Math.cos(Math.toRadians(destLat)) *
-                                Math.sin(dLon/2) * Math.sin(dLon/2)
-                ;
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2)
+                + Math.cos(Math.toRadians(startLat))
+                * Math.cos(Math.toRadians(destLat))
+                * Math.sin(dLon/2)
+                * Math.sin(dLon/2);
 
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         double res = R * c; // Distance in km
 
+        // return distance in meters
         return Math.round(res*1000);
     }
 
@@ -172,44 +178,67 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
             if(location != null) {
 
                 if (role.equals("Stealer")) {
-                    final double[] pos = new double[2];
+                    final double[] otherFlagPos = new double[2];
+                    final double[] myFlagPos = new double[2];
 
-                    db.getDbRef().child("Location").addValueEventListener(new ValueEventListener() {
+                     lobby.addValueEventListener(new ValueEventListener(){
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            pos[0] = Double.parseDouble(String.valueOf(snapshot.child("Latitude").getValue()));
-                            pos[1] = Double.parseDouble(String.valueOf(snapshot.child("Longitude").getValue()));
+                            // the snapshot will now contains actual lobby table
+                            // get Location information of other team's flag
+                            otherFlagPos[0] = Double.parseDouble(String.valueOf(snapshot
+                                    .child(otherTeam + "Keeper/Location/Latitude").getValue()));
+                            otherFlagPos[1] = Double.parseDouble(String.valueOf(snapshot
+                                    .child(otherTeam + "Keeper/Location/Longitude").getValue()));
 
-                            angleFromFlag = calculateAngle(location.getLatitude(), location.getLongitude(), pos[0], pos[1]);
-                            /*
-                            double formula = Math.floor(((angleFromFlag - azimuthDeg + 360) % 360) * 100) /100;
-                            azimuthText.setText(formula + "");
-                             */
+                            // get location information of my team's flag
+                            myFlagPos[0] = Double.parseDouble(String.valueOf(snapshot
+                                    .child(team + "Keeper/Location/Latitude").getValue()));
+                            myFlagPos[1] = Double.parseDouble(String.valueOf(snapshot
+                                    .child(team + "Keeper/Location/Longitude").getValue()));
+
+                            // obtain degrees where opposite team's flag is placed
+                            angleFromOtherFlag = calculateAngle(location.getLatitude(),
+                                    location.getLongitude(),
+                                    otherFlagPos[0],
+                                    otherFlagPos[1]);
+                            // obtain degrees where my team's flag is placed
+                            angleFromMyFlag = calculateAngle(location.getLatitude(),
+                                    location.getLongitude(),
+                                    myFlagPos[0],
+                                    myFlagPos[1]);
+
+                            // obtain distances between my position and the two flags
                             long distanceFromOtherFlag = calculateDistance(location.getLatitude(),
-                                    location.getLongitude(), pos[0], pos[1]);
+                                    location.getLongitude(), otherFlagPos[0], otherFlagPos[1]);
                             distanceFromOtherView.setText(distanceFromOtherFlag + "");
+                            long distanceFromMyFlag = calculateDistance(location.getLatitude(),
+                                    location.getLongitude(), myFlagPos[0], myFlagPos[1]);
+                            distanceFromMyTeamFlagView.setText(distanceFromMyFlag + "");
 
-
+                            // check if the game is ended
                             if(snapshot.child("State").getValue().toString().equals("End")){
                                 endGame(snapshot.child("Score").getValue().toString());
-
                             }
                             // check if actual distance from opposite team's flag is near to me
                             if (distanceFromOtherFlag < 5) {
                                 String status = snapshot.child("State").getValue().toString();
+                                // TIE when each team is winning
                                 if(status.equals(otherTeam + " is winning")){
-                                    db.getDbRef().child(gameCode).child("State").setValue("End");
-                                    db.getDbRef().child(gameCode).child("Score").setValue("Tie");
+                                    lobby.child("State").setValue("End");
+                                    lobby.child("Score").setValue("Tie");
                                     endGame("Tie");
-                                } else if (status.equals(team + " is winning")){
-                                    db.getDbRef().child(gameCode).child("State").setValue("End");
-                                    db.getDbRef().child(gameCode).child("Score").setValue(team + " wins");
+                                }
+                                // If my team is Winning so My team will WIN the game
+                                else if (status.equals(team + " is winning")){
+                                    lobby.child("State").setValue("End");
+                                    lobby.child("Score").setValue(team + " wins");
                                     endGame(team + " wins");
                                 } else {
-                                    db.getDbRef().child(gameCode).child("State").setValue(team + " is winning");
+                                    // set state to my team os winning and re-check after
+                                    lobby.child("State").setValue(team + " is winning");
                                 }
                             }
-
                         }
 
                         @Override
@@ -218,16 +247,20 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                         }
                     });
                 } else if (role.equals("Keeper")) {
-                    myTeamFlagRef.child("Location").child("Latitude").setValue(location.getLatitude());
-                    myTeamFlagRef.child("Location").child("Longitude").setValue(location.getLongitude());
+                    // just update position if my role is "Keeper"
+                    myTeamFlagRef.child("Location").child("Latitude")
+                            .setValue(location.getLatitude());
+                    myTeamFlagRef.child("Location").child("Longitude")
+                            .setValue(location.getLongitude());
+                    // and continue running :)
 
                     db.getDbRef().child("State").addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            // End the game when the state is set to END
                             if(snapshot.child("State").getValue().toString().equals("End")){
                                 endGame(snapshot.child("Score").getValue().toString());
                             }
-
                         }
 
                         @Override
@@ -329,8 +362,10 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         azimuthDeg = azimuth;
 
         // set the textView update in real time for every movement of the device
-        double formula = Math.floor(((angleFromFlag - azimuthDeg + 360) % 360) * 100) /100;
-        azimuthText.setText(formula + "");
+        double formula = Math.floor(((angleFromOtherFlag - azimuthDeg + 360) % 360) * 100) /100;
+        double formula2 = Math.floor(((angleFromMyFlag - azimuthDeg + 360) % 360) * 100) /100;
+        degreeFromOtherView.setText(formula + "");
+        degreeFromMyTeamFlagView.setText(formula2 + "");
 
     }
 

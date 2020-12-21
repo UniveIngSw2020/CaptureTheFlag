@@ -20,13 +20,15 @@ public class ScoreActivity extends AppCompatActivity {
         Intent i = this.getIntent();
         String team = i.getStringExtra("team");
         String score = i.getStringExtra("score");
+        // score contains the message: "Red/Blue wins"
 
         StoredDataManager sdm = new StoredDataManager(ScoreActivity.this.getFilesDir());
         TextView scoreText = findViewById(R.id.score);
 
-        if(score.equals("Tie")){
+        if(score.equals("Tie")) {
             sdm.increaseTies();
             scoreText.setText("Tie");
+            // check if score message contains "myTeamColor wins"  then my team won the game
         } else if(score.equals(team + " wins")){
             sdm.increaseWins();
             scoreText.setText("You won");

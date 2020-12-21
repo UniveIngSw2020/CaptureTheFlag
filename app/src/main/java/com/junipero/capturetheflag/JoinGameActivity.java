@@ -25,8 +25,6 @@ import java.util.Iterator;
 
 public class JoinGameActivity extends AppCompatActivity {
 
-    boolean isAdded = false;
-
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +32,7 @@ public class JoinGameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_join_game);
 
         TextView test = findViewById(R.id.joingametv);
-        test.setText("SONO NELLA JOIN GAMEEEE");
+        test.setText("JOIN GAME");
 
         final EditText edit_game = findViewById(R.id.inputidgame);
         final TextView wait_start = findViewById(R.id.waitstart);
@@ -51,24 +49,24 @@ public class JoinGameActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         //checking if the lobby exists
                         if (snapshot.hasChild(edit_game.getText().toString())){
-                            Toast.makeText(JoinGameActivity.this, "Room TROVATA", Toast.LENGTH_SHORT)
-                                    .show();
-
+                            // the lobby room exists
                             lobby.child(edit_game.getText().toString()).child("Players")
                                     .addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    // if > 10 cannot enter
                                     if(snapshot.getChildrenCount() < 10){
-
                                         // inserting my info in players table in the db
                                         lobby.child(edit_game.getText().toString()).child("Players")
                                                 .child(me.readID()).setValue(me.readName());
 
-                                        isAdded = true;
                                         //players.child(me.readID()).setValue(me.readName());
                                         //write code to perform in db
-                                        // if > 10 cannot enter
-                                        Toast.makeText(JoinGameActivity.this,  Long.valueOf(snapshot.getChildrenCount()).toString() , Toast.LENGTH_SHORT).show();
+                                        /*  DEBUG: show players in room
+                                        Toast.makeText(JoinGameActivity.this,
+                                                Long.valueOf(snapshot.getChildrenCount()).toString() ,
+                                                Toast.LENGTH_SHORT).show();
+                                         */
                                         wait_start.setText("waiting to start the game...");
 
                                         // then check if the status changed into "Timer"
@@ -78,7 +76,7 @@ public class JoinGameActivity extends AppCompatActivity {
                                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                                 // here's the checker, then start the Timer activity
                                                 if (snapshot.getValue().toString().equals("Timer")){
-                                                    // use timeractivity insted of gameActivity
+                                                    // when State is set to TIMER, switch to TimerActivity
                                                     Intent i = new Intent(JoinGameActivity.this, TimerActivity.class);
                                                     i.putExtra("gameCode", edit_game.getText().toString());
                                                     startActivity(i);
@@ -91,10 +89,9 @@ public class JoinGameActivity extends AppCompatActivity {
                                             }
                                         });
                                     }else{
-                                        Toast.makeText(JoinGameActivity.this, "Capienza massima raggiunta", Toast.LENGTH_SHORT)
+                                        Toast.makeText(JoinGameActivity.this, "Room is currently full", Toast.LENGTH_SHORT)
                                                 .show();
                                     }
-                                    // need to add if for the state of the game
                                 }
 
                                 @Override
@@ -105,10 +102,10 @@ public class JoinGameActivity extends AppCompatActivity {
 
 
                         }else{
-                            Toast.makeText(JoinGameActivity.this, "Room NON TROVATA", Toast.LENGTH_SHORT)
+                            //
+                            Toast.makeText(JoinGameActivity.this, "Room not found ¯\\_(ツ)_//¯", Toast.LENGTH_SHORT)
                                     .show();
-
-                            //cannot press the join button
+                            // the join button will be available for next code of lobby
                         }
                     }
 
