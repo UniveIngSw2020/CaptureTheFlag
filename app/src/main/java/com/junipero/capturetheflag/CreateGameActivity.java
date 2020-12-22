@@ -146,7 +146,7 @@ public class CreateGameActivity extends AppCompatActivity {
 
                 // crate teams in db then add players in their team
                 for (Quadruple player : final_players_list){
-                    // gameCode -> team -> role -> Id -> name, role
+                    // gameCode -> team -> role -> Id -> name
                     // adding the nme of player into his opportune location in db
                     lobby.child(player.fourth.toString())
                             .child(player.third.toString())
@@ -156,6 +156,9 @@ public class CreateGameActivity extends AppCompatActivity {
 
                 // set State of current game in "Timer" after shunting
                 lobby.child("State").setValue("Timer");
+
+                // set the number of players
+                lobby.child("Number of players").setValue(players_list.size());
 
                 // -> timer Activity
                 Intent i = new Intent(CreateGameActivity.this, TimerActivity.class);

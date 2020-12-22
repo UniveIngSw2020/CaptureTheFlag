@@ -13,6 +13,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,8 @@ import com.junipero.capturetheflag.R;
 import com.junipero.capturetheflag.ScoreActivity;
 import com.junipero.capturetheflag.TimerActivity;
 
+import static android.content.ContentValues.TAG;
+
 public class TabGameActivity extends Fragment implements SensorEventListener {
 
     private SensorManager mSensorManager;
@@ -49,6 +52,8 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
     String role;
     String team;
     String otherTeam;
+
+    int numberOfPlayers = 10;
 
     DatabaseReference lobby;
     DatabaseReference myTeamFlagRef;
@@ -274,6 +279,19 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                                     endGame(snapshot.child("Score").getValue().toString());
                                 }
 
+                                // check if the game has been cancelled
+                                else if(snapshot.child("State").getValue().toString().equals("Cancelled")){
+                                    endGame("Cancelled");
+                                }
+
+                                // Cancel the game if the numbers of player is too low
+                                else if(Integer.parseInt(snapshot.child("Number of players").getValue().toString()) < 4){
+                                    lobby.child("State").setValue("Cancelled");
+                                    endGame("Cancelled");
+                                } else {
+                                    numberOfPlayers = Integer.parseInt(snapshot.child("Number of players").getValue().toString());
+                                }
+
                                 // check if actual distance from opposite team's flag is near to me
                                 if (distanceFromOtherFlag < 5) {
                                     String status = snapshot.child("State").getValue().toString();
@@ -318,6 +336,19 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                             if(snapshot.child("State").getValue().toString().equals("End")){
                                 endGame(snapshot.child("Score").getValue().toString());
                             }
+
+                            // check if the game has been cancelled
+                            else if(snapshot.child("State").getValue().toString().equals("Cancelled")){
+                                endGame("Cancelled");
+                            }
+
+                            // Cancel the game if the numbers of player is too low
+                            else if(Integer.parseInt(snapshot.child("Number of players").getValue().toString()) < 4){
+                                lobby.child("State").setValue("Cancelled");
+                                endGame("Cancelled");
+                            } else {
+                                numberOfPlayers = Integer.parseInt(snapshot.child("Number of players").getValue().toString());
+                            }
                         }
 
                         @Override
@@ -360,6 +391,19 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         if (mSensorMagnetometer != null) {
             mSensorManager.registerListener(this, mSensorMagnetometer,
                     SensorManager.SENSOR_DELAY_NORMAL);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        // if a player leave the game, he decrease the number of players in the game
+        lobby.child("Number of players").setValue(numberOfPlayers-1);
+
+        // if the player is a "Keeper", if he left the game, the game is cancelled
+        if(role.equals("Keeper")){
+            lobby.child("State").setValue("Cancelled");
         }
     }
 

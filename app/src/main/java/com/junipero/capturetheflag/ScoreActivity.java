@@ -27,14 +27,16 @@ public class ScoreActivity extends AppCompatActivity {
         Intent i = this.getIntent();
         String team = i.getStringExtra("team");
         String score = i.getStringExtra("score");
-        // score contains the message: "Red/Blue wins"
+        // score contains the message: "Red/Blue wins" or "Tie" or "Cancelled"
         final String gameCode = i.getStringExtra("gameCode");
 
 
         StoredDataManager sdm = new StoredDataManager(ScoreActivity.this.getFilesDir());
         TextView scoreText = findViewById(R.id.score);
 
-        if(score.equals("Tie")) {
+        if(score.equals("Cancelled")){
+            scoreText.setText("The game has been cancelled");
+        } else if(score.equals("Tie")) {
             sdm.increaseTies();
             scoreText.setText("Tie");
             // check if score message contains "myTeamColor wins"  then my team won the game
@@ -48,7 +50,9 @@ public class ScoreActivity extends AppCompatActivity {
 
         // delete record of the game played from db if still exists
         assert gameCode != null;
-        DatabaseReference db = new GameDB().getDbRef().child(gameCode);
+        DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
+        lobby.removeValue();
+        /*
         db.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -66,7 +70,7 @@ public class ScoreActivity extends AppCompatActivity {
             }
         });
 
-
+         */
 
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
