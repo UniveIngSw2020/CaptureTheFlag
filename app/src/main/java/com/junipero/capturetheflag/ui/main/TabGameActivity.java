@@ -231,6 +231,8 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             // the snapshot will now contains actual lobby table
+
+                            // checking if locations != null
                             if (snapshot.child(otherTeam + "/Keeper/Location/Latitude").getValue() != null
                                     && snapshot.child(otherTeam + "/Keeper/Location/Longitude").getValue() != null
                                     && snapshot.child(team + "/Keeper/Location/Latitude").getValue() != null
