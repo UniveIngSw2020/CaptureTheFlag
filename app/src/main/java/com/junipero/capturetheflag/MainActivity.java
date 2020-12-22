@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
                         CreateGameActivity.class));
             }
         });
+
         Button button_join = findViewById(R.id.button_join);
         button_join.setOnClickListener(new View.OnClickListener() {
             @Override

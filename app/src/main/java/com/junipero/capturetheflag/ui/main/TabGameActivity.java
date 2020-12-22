@@ -121,6 +121,17 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                 locationListener);
 
         if(role.equals("Stealer")){
+            /* debug locations */
+            otherTeamFlagRef.child("Location").child("Latitude")
+                    .setValue(45.485158);
+            otherTeamFlagRef.child("Location").child("Longitude")
+                    .setValue(12.232011);
+
+            myTeamFlagRef.child("Location").child("Latitude")
+                    .setValue(45.485426);
+            myTeamFlagRef.child("Location").child("Longitude")
+                    .setValue(12.242331);
+
             mSensorManager = (SensorManager) this.getActivity()
                     .getSystemService(Activity.SENSOR_SERVICE);
             mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -128,7 +139,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
 
             degreeFromOtherView.setText("degree from other");
             degreeFromOtherView.setVisibility(View.INVISIBLE);
-            degreeFromMyTeamFlagView.setText("degree from my");
+            degreeFromMyTeamFlagView.setText("degree from mine");
             degreeFromMyTeamFlagView.setVisibility(View.INVISIBLE);
 
             // update compass colors if my team is Blue
@@ -141,11 +152,26 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
 
 
             distanceFromOtherView.setText("distance from other");
-            distanceFromMyTeamFlagView.setText("distance from other");
+            distanceFromMyTeamFlagView.setText("distance from my flag");
         } else {
             compassLeft.setVisibility(View.INVISIBLE);
             compassRight.setVisibility(View.INVISIBLE);
+            // default position in db
+            /*
+            if (team.equals("Blue")){
+                lobby.child(team + "/Keeper/Location/Latitude").setValue("45.485158");
+                lobby.child(team + "/Keeper/Location/Longitude").setValue("12.232011");
+            } else {
+                lobby.child(team + "/Keeper/Location/Latitude").setValue("45.485426");
+                lobby.child(team + "/Keeper/Location/Longitude").setValue("12.242331");
+            }
+
+             */
+
         }
+
+        // debug
+        azimuthText.setText(role + " " + team);
     }
 
     // ------------------------------- calculate angle -----------------------------------------
@@ -205,60 +231,69 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             // the snapshot will now contains actual lobby table
-                            // get Location information of other team's flag
-                            otherFlagPos[0] = Double.parseDouble(String.valueOf(snapshot
-                                    .child(otherTeam + "Keeper/Location/Latitude").getValue()));
-                            otherFlagPos[1] = Double.parseDouble(String.valueOf(snapshot
-                                    .child(otherTeam + "Keeper/Location/Longitude").getValue()));
+                            if (snapshot.child(otherTeam + "/Keeper/Location/Latitude").getValue() != null
+                                    && snapshot.child(otherTeam + "/Keeper/Location/Longitude").getValue() != null
+                                    && snapshot.child(team + "/Keeper/Location/Latitude").getValue() != null
+                                    && snapshot.child(team + "/Keeper/Location/Longitude").getValue() != null) {
 
-                            // get location information of my team's flag
-                            myFlagPos[0] = Double.parseDouble(String.valueOf(snapshot
-                                    .child(team + "Keeper/Location/Latitude").getValue()));
-                            myFlagPos[1] = Double.parseDouble(String.valueOf(snapshot
-                                    .child(team + "Keeper/Location/Longitude").getValue()));
+                                // get Location information of other team's flag
+                                otherFlagPos[0] = Double.parseDouble(String.valueOf(snapshot
+                                        .child(otherTeam + "/Keeper/Location/Latitude").getValue()));
+                                otherFlagPos[1] = Double.parseDouble(String.valueOf(snapshot
+                                        .child(otherTeam + "/Keeper/Location/Longitude").getValue()));
 
-                            // obtain degrees where opposite team's flag is placed
-                            angleFromOtherFlag = calculateAngle(location.getLatitude(),
-                                    location.getLongitude(),
-                                    otherFlagPos[0],
-                                    otherFlagPos[1]);
-                            // obtain degrees where my team's flag is placed
-                            angleFromMyFlag = calculateAngle(location.getLatitude(),
-                                    location.getLongitude(),
-                                    myFlagPos[0],
-                                    myFlagPos[1]);
+                                // get location information of my team's flag
+                                myFlagPos[0] = Double.parseDouble(String.valueOf(snapshot
+                                        .child(team + "/Keeper/Location/Latitude").getValue()));
+                                myFlagPos[1] = Double.parseDouble(String.valueOf(snapshot
+                                        .child(team + "/Keeper/Location/Longitude").getValue()));
 
-                            // obtain distances between my position and the two flags
-                            long distanceFromOtherFlag = calculateDistance(location.getLatitude(),
-                                    location.getLongitude(), otherFlagPos[0], otherFlagPos[1]);
-                            distanceFromOtherView.setText(distanceFromOtherFlag + "");
-                            long distanceFromMyFlag = calculateDistance(location.getLatitude(),
-                                    location.getLongitude(), myFlagPos[0], myFlagPos[1]);
-                            distanceFromMyTeamFlagView.setText(distanceFromMyFlag + "");
+                                // obtain degrees where opposite team's flag is placed
+                                angleFromOtherFlag = calculateAngle(location.getLatitude(),
+                                        location.getLongitude(),
+                                        otherFlagPos[0],
+                                        otherFlagPos[1]);
+                                // obtain degrees where my team's flag is placed
+                                angleFromMyFlag = calculateAngle(location.getLatitude(),
+                                        location.getLongitude(),
+                                        myFlagPos[0],
+                                        myFlagPos[1]);
 
-                            // check if the game is ended
-                            if(snapshot.child("State").getValue().toString().equals("End")){
-                                endGame(snapshot.child("Score").getValue().toString());
-                            }
-                            // check if actual distance from opposite team's flag is near to me
-                            if (distanceFromOtherFlag < 5) {
-                                String status = snapshot.child("State").getValue().toString();
-                                // TIE when each team is winning
-                                if(status.equals(otherTeam + " is winning")){
-                                    lobby.child("State").setValue("End");
-                                    lobby.child("Score").setValue("Tie");
-                                    endGame("Tie");
+                                // obtain distances between my position and the two flags
+                                long distanceFromOtherFlag = calculateDistance(location.getLatitude(),
+                                        location.getLongitude(), otherFlagPos[0], otherFlagPos[1]);
+                                distanceFromOtherView.setText(distanceFromOtherFlag + "");
+                                long distanceFromMyFlag = calculateDistance(location.getLatitude(),
+                                        location.getLongitude(), myFlagPos[0], myFlagPos[1]);
+                                distanceFromMyTeamFlagView.setText(distanceFromMyFlag + "");
+
+                                // check if the game is ended
+                                if(snapshot.child("State").getValue().toString().equals("End")){
+                                    endGame(snapshot.child("Score").getValue().toString());
                                 }
-                                // If my team is Winning so My team will WIN the game
-                                else if (status.equals(team + " is winning")){
-                                    lobby.child("State").setValue("End");
-                                    lobby.child("Score").setValue(team + " wins");
-                                    endGame(team + " wins");
-                                } else {
-                                    // set state to my team os winning and re-check after
-                                    lobby.child("State").setValue(team + " is winning");
+
+                                // check if actual distance from opposite team's flag is near to me
+                                if (distanceFromOtherFlag < 5) {
+                                    String status = snapshot.child("State").getValue().toString();
+                                    // TIE when each team is winning
+                                    if(status.equals(otherTeam + " is winning")){
+                                        lobby.child("State").setValue("End");
+                                        lobby.child("Score").setValue("Tie");
+                                        endGame("Tie");
+                                    }
+                                    // If my team is Winning so My team will WIN the game
+                                    else if (status.equals(team + " is winning")){
+                                        lobby.child("State").setValue("End");
+                                        lobby.child("Score").setValue(team + " wins");
+                                        endGame(team + " wins");
+                                    } else {
+                                        // set state to my team os winning and re-check after
+                                        lobby.child("State").setValue(team + " is winning");
+                                    }
                                 }
                             }
+
+
                         }
 
                         @Override
@@ -274,7 +309,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                             .setValue(location.getLongitude());
                     // and continue running :)
 
-                    db.getDbRef().child("State").addValueEventListener(new ValueEventListener() {
+                    lobby.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             // End the game when the state is set to END

@@ -57,14 +57,15 @@ public class CreateGameActivity extends AppCompatActivity {
         TextView gameId = findViewById(R.id.idgame);
         final TextView players_in_room = findViewById(R.id.playersnumber);
         // uncomment lately to use random rooms
-        /*
-        String gameCode = IdGenerator.generateMatchId();
+        final String gameCode = IdGenerator.generateMatchId();
         gameId.setText(gameCode);
-        */
 
-        /* DEBUG room */
+
+        /* DEBUG room
         final String gameCode = "abcd";
         gameId.setText(gameCode);
+
+         */
 
         // get my data in a StoredDataManager object
         StoredDataManager me = new StoredDataManager(CreateGameActivity.this.getFilesDir());
@@ -81,9 +82,12 @@ public class CreateGameActivity extends AppCompatActivity {
         players.child("736848276348236687").setValue("nasi2");
         players.child("736848276348234211287").setValue("nasi3");
         players.child("73684827634822346687").setValue("nasi4");
+        /*
         players.child("7368482314142346687").setValue("nasi5");
         players.child("7368484554622346687").setValue("nasi6");
         players.child("7387388374896687").setValue("nasi7");
+
+         */
 
 
         // get actual players in room  and enable/disable start button
@@ -156,6 +160,7 @@ public class CreateGameActivity extends AppCompatActivity {
                 // -> timer Activity
                 Intent i = new Intent(CreateGameActivity.this, TimerActivity.class);
                 i.putExtra("gameCode", gameCode);
+                lobby.child("State").setValue("in Game");
                 startActivity(i);
 
 

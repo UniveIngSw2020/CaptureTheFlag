@@ -19,4 +19,11 @@ public class ExampleUnitTest {
     public void addition_isCorrect() {
         assertEquals(4, 2 + 2);
     }
+
+    @Test
+    public void parseDoubleWorking(){
+        String s = "45.485158";
+
+        double value = Double.parseDouble(s);
+    }
 }
