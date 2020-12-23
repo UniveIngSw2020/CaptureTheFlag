@@ -27,6 +27,11 @@ import java.util.Collections;
 
 public class CreateGameActivity extends AppCompatActivity {
 
+    private String gameCode;
+    private DatabaseReference lobby;
+
+
+
     // declaration of a Quadruple class
     private class Quadruple<A, B, C, D>{
         private final A first;
@@ -57,7 +62,7 @@ public class CreateGameActivity extends AppCompatActivity {
         TextView gameId = findViewById(R.id.idgame);
         final TextView players_in_room = findViewById(R.id.playersnumber);
         // uncomment lately to use random rooms
-        final String gameCode = IdGenerator.generateMatchId();
+        gameCode = IdGenerator.generateMatchId();
         gameId.setText(gameCode);
 
 
@@ -71,7 +76,7 @@ public class CreateGameActivity extends AppCompatActivity {
         StoredDataManager me = new StoredDataManager(CreateGameActivity.this.getFilesDir());
 
         // ref to lobby
-        final DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
+        lobby = new GameDB().getDbRef().child(gameCode);
         // set the current state of the game
         lobby.child("State").setValue("Waiting for start");
         // adding myself to the lobby
@@ -165,9 +170,17 @@ public class CreateGameActivity extends AppCompatActivity {
                 i.putExtra("gameCode", gameCode);
                 lobby.child("State").setValue("in Game");
                 startActivity(i);
+                finish();
 
 
             }
         });
-        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        lobby.removeValue();
+
+    }
 }

@@ -122,12 +122,10 @@ public class TimerActivity extends AppCompatActivity {
                 i.putExtra("role", data[1]);
                 i.putExtra("team", data[2]);
                 startActivity(i);
+                finish();
 
             }
         }.start();
-
-
-
 
 
     }
@@ -141,6 +139,7 @@ public class TimerActivity extends AppCompatActivity {
         DatabaseReference db = new GameDB().getDbRef().child(gameCode);
         // then remove data
         db.removeValue();
+        finish();
     }
 
 }

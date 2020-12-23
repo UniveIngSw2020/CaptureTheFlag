@@ -176,7 +176,8 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         }
 
         // debug
-        azimuthText.setText(role + " " + team);
+        azimuthText.setText(role + " " + team + "\nLatitude: " + location.getLatitude()
+            + "\nLongitude: " + location.getLongitude());
     }
 
     // ------------------------------- calculate angle -----------------------------------------
@@ -329,26 +330,34 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                             .setValue(location.getLongitude());
                     // and continue running :)
 
+                    // debug
+                    azimuthText.setText(role + " " + team + "\nLatitude: " + location.getLatitude()
+                            + "\nLongitude: " + location.getLongitude());
+
                     lobby.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            // End the game when the state is set to END
-                            if(snapshot.child("State").getValue().toString().equals("End")){
-                                endGame(snapshot.child("Score").getValue().toString());
+
+                            if (snapshot.child("State").getValue() != null){
+                                // End the game when the state is set to END
+                                if(snapshot.child("State").getValue().toString().equals("End")){
+                                    endGame(snapshot.child("Score").getValue().toString());
+                                }
+
+                                // check if the game has been cancelled
+                                else if(snapshot.child("State").getValue().toString().equals("Cancelled")){
+                                    endGame("Cancelled");
+                                }
+
+                                // Cancel the game if the numbers of player is too low
+                                else if(Integer.parseInt(snapshot.child("Number of players").getValue().toString()) < 4){
+                                    lobby.child("State").setValue("Cancelled");
+                                    endGame("Cancelled");
+                                } else {
+                                    numberOfPlayers = Integer.parseInt(snapshot.child("Number of players").getValue().toString());
+                                }
                             }
 
-                            // check if the game has been cancelled
-                            else if(snapshot.child("State").getValue().toString().equals("Cancelled")){
-                                endGame("Cancelled");
-                            }
-
-                            // Cancel the game if the numbers of player is too low
-                            else if(Integer.parseInt(snapshot.child("Number of players").getValue().toString()) < 4){
-                                lobby.child("State").setValue("Cancelled");
-                                endGame("Cancelled");
-                            } else {
-                                numberOfPlayers = Integer.parseInt(snapshot.child("Number of players").getValue().toString());
-                            }
                         }
 
                         @Override
@@ -413,8 +422,14 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
 
         // Unregister all sensor listeners in this callback so they don't
         // continue to use resources when the app is stopped.
-        mSensorManager.unregisterListener(this);
+        if (mSensorManager != null)
+            mSensorManager.unregisterListener(this);
+
+        //lobby.removeValue();
+        getActivity().finish();
     }
+
+
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -507,4 +522,5 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
     }
 
     //------------------------------------------------------------------------------------------
+
 }

@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.junipero.capturetheflag.ui.main.SectionsPagerAdapter;
@@ -40,9 +41,12 @@ public class GameActivity extends AppCompatActivity {
         //TextView myLocation = findViewById(R.id....);
 
         final DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
+        /*
         final DatabaseReference myTeamFlagRef = lobby.child(team).child("Keeper");
         final DatabaseReference otherTeamFlagRef = lobby.child((team.equals("Blue") ? "Red" : "Blue" ))
                 .child("Keeper");
+
+         */
 
 
 
@@ -51,4 +55,5 @@ public class GameActivity extends AppCompatActivity {
 
 
     }
+
 }

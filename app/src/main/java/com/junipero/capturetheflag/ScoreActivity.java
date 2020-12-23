@@ -48,10 +48,7 @@ public class ScoreActivity extends AppCompatActivity {
             scoreText.setText("You lost");
         }
 
-        // delete record of the game played from db if still exists
-        assert gameCode != null;
-        DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
-        lobby.removeValue();
+
         /*
         db.addValueEventListener(new ValueEventListener() {
             @Override
@@ -75,8 +72,14 @@ public class ScoreActivity extends AppCompatActivity {
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
+                // delete record of the game played from db if still exists
+                assert gameCode != null;
+                DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
+                lobby.removeValue();
+
                 startActivity(new Intent(ScoreActivity.this,
                         MainActivity.class));
+                finish();
             }
         }, 3000);
     }
