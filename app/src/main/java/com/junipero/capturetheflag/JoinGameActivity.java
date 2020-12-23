@@ -80,6 +80,7 @@ public class JoinGameActivity extends AppCompatActivity {
                                                     Intent i = new Intent(JoinGameActivity.this, TimerActivity.class);
                                                     i.putExtra("gameCode", edit_game.getText().toString());
                                                     startActivity(i);
+                                                    finish();
                                                 }
                                             }
 

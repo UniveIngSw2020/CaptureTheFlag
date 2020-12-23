@@ -39,7 +39,15 @@ public class MainActivity extends AppCompatActivity {
 
         // -------------------BUTTONS-------------------------------
 
+
         Button button_create = findViewById(R.id.button_create);
+        /*
+        StoredDataManager sdm = new StoredDataManager(MainActivity.this.getFilesDir());
+        if(! sdm.getUser().getName().equals("nasik")){
+            button_create.setVisibility(View.INVISIBLE);
+        }
+        */
+
         button_create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

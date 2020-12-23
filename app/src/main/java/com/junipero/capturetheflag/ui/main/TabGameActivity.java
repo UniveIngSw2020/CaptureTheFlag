@@ -426,7 +426,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
             mSensorManager.unregisterListener(this);
 
         //lobby.removeValue();
-        getActivity().finish();
+        //getActivity().finish();
     }
 
 
@@ -519,6 +519,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         i.putExtra("team", team);
         i.putExtra("gameCode", gameCode);
         startActivity(i);
+        getActivity().finish();
     }
 
     //------------------------------------------------------------------------------------------
