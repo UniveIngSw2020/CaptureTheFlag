@@ -127,4 +127,8 @@
     <string name="game_fragment_title">HELLO GAME FRAGGGGMNET</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_chat">Hello CHATfragment</string>
+    <string name="todo">TODO</string>
+    <string name="your_score">Your score</string>
+    <string name="name">Name</string>
+    <string name="ok">Ok</string>
 </resources>
