@@ -1,5 +1,6 @@
 package com.junipero.capturetheflag;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -55,7 +56,7 @@ public class TimerActivity extends AppCompatActivity {
 
         // get your data from db
         lobby.addValueEventListener(new ValueEventListener() {
-            @SuppressLint("SetTextI18n")
+            @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
@@ -64,7 +65,8 @@ public class TimerActivity extends AppCompatActivity {
                     if(ds.getKey().equals(sdm.readID())){
                         // you are in team RED, and your role is : Keeper
                         roleViewer.setText("Keeper");
-                        layout.setBackgroundColor(Color.RED);
+                        //layout.setBackgroundColor(Color.RED);
+                        layout.setBackground(getDrawable(R.drawable.red_bg));
                         data[1] = roleViewer.getText().toString();
                         data[2] = "Red";
                     }
@@ -73,7 +75,8 @@ public class TimerActivity extends AppCompatActivity {
                     if(ds.getKey().equals(sdm.readID())){
                         // you are in team RED, and your role is : Stealer
                         roleViewer.setText("Stealer");
-                        layout.setBackgroundColor(Color.RED);
+                        //layout.setBackgroundColor(Color.RED);
+                        layout.setBackground(getDrawable(R.drawable.red_bg));
                         data[1] = roleViewer.getText().toString();
                         data[2] = "Red";
                     }
@@ -82,7 +85,8 @@ public class TimerActivity extends AppCompatActivity {
                     if(ds.getKey().equals(sdm.readID())){
                         // you are in team BLUE, and your role is : Keeper
                         roleViewer.setText("Keeper");
-                        layout.setBackgroundColor(Color.BLUE);
+                        //layout.setBackgroundColor(Color.BLUE);
+                        layout.setBackground(getDrawable(R.drawable.blue_bg));
                         data[1] = roleViewer.getText().toString();
                         data[2] = "Blue";
                     }
@@ -91,7 +95,8 @@ public class TimerActivity extends AppCompatActivity {
                     if(ds.getKey().equals(sdm.readID())){
                         // you are in team BLUE, and your role is : Stealer
                         roleViewer.setText("Stealer");
-                        layout.setBackgroundColor(Color.BLUE);
+                        //layout.setBackgroundColor(Color.BLUE);
+                        layout.setBackground(getDrawable(R.drawable.blue_bg));
                         data[1] = roleViewer.getText().toString();
                         data[2] = "Blue";
                     }
