@@ -9,6 +9,19 @@
     android:background="@drawable/home_bg"
     tools:context=".TimerActivity">
 
+    <ImageView
+        android:id="@+id/flagbggame"
+        android:layout_width="132dp"
+        android:layout_height="130dp"
+        android:contentDescription="@string/todo"
+        app:layout_constraintBottom_toTopOf="@+id/timeView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.462"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/teamView"
+        app:layout_constraintVertical_bias="0.448"
+        app:srcCompat="@drawable/bg_flag" />
+
     <TextView
         android:id="@+id/GameID"
         android:layout_width="wrap_content"

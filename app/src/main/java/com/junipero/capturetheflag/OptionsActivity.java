@@ -1,19 +1,12 @@
 package com.junipero.capturetheflag;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
-import androidx.fragment.app.Fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Layout;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class OptionsActivity extends AppCompatActivity {
 
@@ -56,7 +49,7 @@ public class OptionsActivity extends AppCompatActivity {
         help.setVisibility(View.INVISIBLE);
         settings.setVisibility(View.INVISIBLE);
         idView = findViewById(R.id.idView);
-        nameView = findViewById(R.id.nameView);
+        nameView = findViewById(R.id.nicknameView);
         winsView = findViewById(R.id.winsView);
         lostsView = findViewById(R.id.lostsView);
         tiesView = findViewById(R.id.tiesView);

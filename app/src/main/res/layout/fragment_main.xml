@@ -7,6 +7,19 @@
     android:layout_height="match_parent"
     tools:context=".ui.main.PlaceholderFragment">
 
+    <ImageView
+        android:id="@+id/flagbggame"
+        android:layout_width="364dp"
+        android:layout_height="355dp"
+        android:contentDescription="@string/todo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.568"
+        app:srcCompat="@drawable/bg_flag" />
+
     <TextView
         android:id="@+id/degreeView"
         android:layout_width="wrap_content"

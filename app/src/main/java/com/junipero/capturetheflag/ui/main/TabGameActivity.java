@@ -122,6 +122,8 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                 locationListener);
 
         if(role.equals("Stealer")){
+            View flag_bg = view.findViewById(R.id.flagbggame);
+            flag_bg.setVisibility(View.INVISIBLE);
             /* debug locations */
             otherTeamFlagRef.child("Location").child("Latitude")
                     .setValue(45.485158);
@@ -147,8 +149,8 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
             }
 
 
-            distanceFromOtherView.setText("Distance from other team's flag");
-            distanceFromMyTeamFlagView.setText("Distance from my team's flag");
+            distanceFromOtherView.setText("Distance from\nother team's flag");
+            distanceFromMyTeamFlagView.setText("Distance from\nmy team's flag");
         } else {
             compassLeft.setVisibility(View.INVISIBLE);
             compassRight.setVisibility(View.INVISIBLE);

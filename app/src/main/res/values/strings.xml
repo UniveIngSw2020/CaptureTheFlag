@@ -18,7 +18,7 @@
     <string name="profile_fragment">PROFILE FRAGMENT</string>
     <string name="settings_fragment">SETTINGS FRAGMENT</string>
     <string name="large_text">
-        "Material is the metaphor.\n\n"
+        "GUIDE FRAGMENT.\n\n"
 
         "A material metaphor is the unifying theory of a rationalized space and a system of motion."
         "The material is grounded in tactile reality, inspired by the study of paper and ink, yet "
@@ -137,4 +137,8 @@
     <string name="goaway">seconds\n\n\nRun away from the other team.</string>
     <string name="blue_arrow">blue arrow</string>
     <string name="red_arrow">red arrow</string>
+    <string name="losts">Losts:</string>
+    <string name="id">ID:</string>
+    <string name="wins">Wins:</string>
+    <string name="nickname">Nickname:</string>
 </resources>

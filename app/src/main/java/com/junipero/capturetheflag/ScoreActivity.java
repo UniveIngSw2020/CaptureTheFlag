@@ -35,7 +35,7 @@ public class ScoreActivity extends AppCompatActivity {
         TextView scoreText = findViewById(R.id.score);
 
         if(score.equals("Cancelled")){
-            scoreText.setText("The game has been cancelled");
+            scoreText.setText("The game\nhas been cancelled");
         } else if(score.equals("Tie")) {
             sdm.increaseTies();
             scoreText.setText("Tie");
