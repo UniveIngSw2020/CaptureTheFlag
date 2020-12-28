@@ -1,5 +1,6 @@
 package com.junipero.capturetheflag;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -7,6 +8,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,6 +26,7 @@ import org.w3c.dom.Text;
 
 public class GameActivity extends AppCompatActivity {
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,10 +52,16 @@ public class GameActivity extends AppCompatActivity {
 
          */
 
-
-
         //final LocationUpdater myPosition = new LocationUpdater(this, myLocation);
 
+
+        CoordinatorLayout layout = findViewById(R.id.gameActivityLayout);
+
+        if(team.equals("Red")){
+            layout.setBackground(getDrawable(R.drawable.red_bg));
+        }else if(team.equals("Blue")){
+            layout.setBackground(getDrawable(R.drawable.blue_bg));
+        }
 
 
     }

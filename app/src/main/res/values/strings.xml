@@ -126,7 +126,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="game_fragment_title">HELLO GAME FRAGGGGMNET</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_chat">Hello CHATfragment</string>
+    <string name="hello_chat">Hello CHAT fragment\n\nQui ci sarà la chat della squadra.</string>
     <string name="todo">TODO</string>
     <string name="your_score">Your score</string>
     <string name="name">Name</string>
@@ -134,4 +134,7 @@
     <string name="start_new_game">
         Start a new game!\n\nChoose if you want create a new lobby or join the lobby of your friend.
     </string>
+    <string name="goaway">seconds\n\n\nRun away from the other team.</string>
+    <string name="blue_arrow">blue arrow</string>
+    <string name="red_arrow">red arrow</string>
 </resources>

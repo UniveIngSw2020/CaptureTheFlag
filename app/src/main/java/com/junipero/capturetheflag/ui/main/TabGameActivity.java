@@ -13,7 +13,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +21,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
-import android.graphics.drawable.ColorDrawable;
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -33,13 +31,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.junipero.capturetheflag.CTFCriteria;
-import com.junipero.capturetheflag.CreateGameActivity;
 import com.junipero.capturetheflag.GameDB;
 import com.junipero.capturetheflag.R;
 import com.junipero.capturetheflag.ScoreActivity;
-import com.junipero.capturetheflag.TimerActivity;
-
-import static android.content.ContentValues.TAG;
 
 public class TabGameActivity extends Fragment implements SensorEventListener {
 
@@ -63,8 +57,6 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
     DatabaseReference myTeamFlagRef;
     DatabaseReference otherTeamFlagRef;
 
-    TextView degreeFromOtherView;
-    TextView degreeFromMyTeamFlagView;
     TextView distanceFromOtherView;
     TextView distanceFromMyTeamFlagView;
 
@@ -107,13 +99,11 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
 
         // initializing some views
         azimuthText = view.findViewById(R.id.degreeView);
-        degreeFromOtherView = view.findViewById(R.id.degreeFromOther);
-        degreeFromMyTeamFlagView = view.findViewById(R.id.degreeFromMyTeam);
         distanceFromOtherView = view.findViewById(R.id.distanceFromOther);
         distanceFromMyTeamFlagView = view.findViewById(R.id.distanceFromMyFlag);
         compassLeft = view.findViewById(R.id.compassLeft);  // blue as default
         compassRight = view.findViewById(R.id.compassRight);    // red as default
-        layout = view.findViewById(R.id.constraintLayout);
+        layout = view.findViewById(R.id.gameLayout);
 
         checkLocationPermission();
 
@@ -130,12 +120,6 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                 1000,
                 0,
                 locationListener);
-
-        if(team.equals("Red")){
-            layout.setBackground(getActivity().getDrawable(R.drawable.red_bg));
-        }else if(team.equals("Blue")){
-            layout.setBackground(getActivity().getDrawable(R.drawable.red_bg));
-        }
 
         if(role.equals("Stealer")){
             /* debug locations */
@@ -154,11 +138,6 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
             mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             mSensorMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
-            degreeFromOtherView.setText("degree from other");
-            degreeFromOtherView.setVisibility(View.INVISIBLE);
-            degreeFromMyTeamFlagView.setText("degree from mine");
-            degreeFromMyTeamFlagView.setVisibility(View.INVISIBLE);
-
             // update compass colors if my team is Blue
             // default compasses are left:blue and right:red
             // left used always for other team's flag
@@ -168,8 +147,8 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
             }
 
 
-            distanceFromOtherView.setText("distance from other");
-            distanceFromMyTeamFlagView.setText("distance from my flag");
+            distanceFromOtherView.setText("Distance from other team's flag");
+            distanceFromMyTeamFlagView.setText("Distance from my team's flag");
         } else {
             compassLeft.setVisibility(View.INVISIBLE);
             compassRight.setVisibility(View.INVISIBLE);
@@ -182,21 +161,19 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                 lobby.child(team + "/Keeper/Location/Latitude").setValue("45.485426");
                 lobby.child(team + "/Keeper/Location/Longitude").setValue("12.242331");
             }
-
              */
 
         }
 
-        // debug
-        azimuthText.setText(role + " " + team + "\nLatitude: " + location.getLatitude()
-            + "\nLongitude: " + location.getLongitude());
+        azimuthText.setText(Html.fromHtml("You are a <b>" + team + " " + role + "</b>"));
+
     }
 
     // ------------------------------- calculate angle -----------------------------------------
     /*
      * very thanks to IGISMap:
-     *https://www.igismap.com/formula-to-find-bearing-or-heading-angle-between-two-points-latitude-longitude/
-    */
+     * https://www.igismap.com/formula-to-find-bearing-or-heading-angle-between-two-points-latitude-longitude/
+    **/
     private double calculateAngle (double startLat, double startLong, double destLat, double destLong){
         double x = Math.cos(Math.toRadians(destLat))
                 * Math.sin(Math.toRadians(destLong - startLong));
@@ -282,10 +259,10 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                                 // obtain distances between my position and the two flags
                                 long distanceFromOtherFlag = calculateDistance(location.getLatitude(),
                                         location.getLongitude(), otherFlagPos[0], otherFlagPos[1]);
-                                distanceFromOtherView.setText(distanceFromOtherFlag + "");
+                                distanceFromOtherView.setText("Distance from\nother team's flag:\n" + distanceFromOtherFlag + " meters");
                                 long distanceFromMyFlag = calculateDistance(location.getLatitude(),
                                         location.getLongitude(), myFlagPos[0], myFlagPos[1]);
-                                distanceFromMyTeamFlagView.setText(distanceFromMyFlag + "");
+                                distanceFromMyTeamFlagView.setText("Distance from\nmy team's flag:\n" + distanceFromMyFlag + " meters");
 
                                 // check if the game is ended
                                 if(snapshot.child("State").getValue().toString().equals("End")){
@@ -342,9 +319,8 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                             .setValue(location.getLongitude());
                     // and continue running :)
 
-                    // debug
-                    azimuthText.setText(role + " " + team + "\nLatitude: " + location.getLatitude()
-                            + "\nLongitude: " + location.getLongitude());
+                    azimuthText.setText(Html.fromHtml("You are a <b>" + team + " " + role + "</b>"));
+
 
                     lobby.addValueEventListener(new ValueEventListener() {
                         @Override

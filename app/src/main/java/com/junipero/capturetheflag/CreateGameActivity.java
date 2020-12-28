@@ -87,10 +87,10 @@ public class CreateGameActivity extends AppCompatActivity {
         /* additional debug players added to start testing of room */
         players.child("736848276348236687").setValue("nasi2");
         players.child("736848276348234211287").setValue("nasi3");
-        /*
+
         players.child("73684827634822346687").setValue("nasi4");
         players.child("7368482314142346687").setValue("nasi5");
-
+        /*
         players.child("7368484554622346687").setValue("nasi6");
         players.child("7387388374896687").setValue("nasi7");
 
