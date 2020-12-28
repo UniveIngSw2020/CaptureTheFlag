@@ -20,7 +20,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+
+import android.graphics.drawable.ColorDrawable;
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -65,6 +69,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
     TextView distanceFromMyTeamFlagView;
 
     ImageView compassLeft, compassRight;
+    ConstraintLayout layout;
 
     double angleFromOtherFlag;
     double angleFromMyFlag;
@@ -82,7 +87,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
     }
 
     // put your code in onViewCreated, it is called after onCreateView
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -108,6 +113,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         distanceFromMyTeamFlagView = view.findViewById(R.id.distanceFromMyFlag);
         compassLeft = view.findViewById(R.id.compassLeft);  // blue as default
         compassRight = view.findViewById(R.id.compassRight);    // red as default
+        layout = view.findViewById(R.id.constraintLayout);
 
         checkLocationPermission();
 
@@ -124,6 +130,12 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                 1000,
                 0,
                 locationListener);
+
+        if(team.equals("Red")){
+            layout.setBackground(getActivity().getDrawable(R.drawable.red_bg));
+        }else if(team.equals("Blue")){
+            layout.setBackground(getActivity().getDrawable(R.drawable.red_bg));
+        }
 
         if(role.equals("Stealer")){
             /* debug locations */

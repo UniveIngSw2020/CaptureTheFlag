@@ -15,7 +15,7 @@
         android:roundIcon="@drawable/ctf"
         android:screenOrientation="portrait"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.NoActionBar"
+        android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
         <activity android:name=".ScoreActivity" />
         <activity

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CaptureTheFlag</string>
+    <string name="app_name">Capture the Flag</string>
     <string name="saved_high_score_key">14</string>
     <string name="ctflogo">CTFLOGO</string>
     <string name="create_lobby">Create Lobby</string>
