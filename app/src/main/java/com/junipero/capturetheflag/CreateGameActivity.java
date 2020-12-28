@@ -3,6 +3,7 @@ package com.junipero.capturetheflag;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
@@ -54,7 +55,7 @@ public class CreateGameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_game);
 
         TextView test = findViewById(R.id.creategametv);
-        test.setText("CREATE GAME");
+        test.setText("CREATE A LOBBY");
 
         final Button startbutton = findViewById(R.id.startbutton);
         final ArrayList<Pair<String, String>> players_list = new ArrayList<>();
@@ -63,7 +64,7 @@ public class CreateGameActivity extends AppCompatActivity {
         final TextView players_in_room = findViewById(R.id.playersnumber);
         // uncomment lately to use random rooms
         gameCode = IdGenerator.generateMatchId();
-        gameId.setText(gameCode);
+        gameId.setText(Html.fromHtml("The code for your lobby is: " + "<b>"+gameCode+"</b>"));
 
 
         /* DEBUG room
@@ -85,10 +86,11 @@ public class CreateGameActivity extends AppCompatActivity {
 
         /* additional debug players added to start testing of room */
         players.child("736848276348236687").setValue("nasi2");
-        /*
         players.child("736848276348234211287").setValue("nasi3");
+        /*
         players.child("73684827634822346687").setValue("nasi4");
         players.child("7368482314142346687").setValue("nasi5");
+
         players.child("7368484554622346687").setValue("nasi6");
         players.child("7387388374896687").setValue("nasi7");
 
@@ -99,9 +101,10 @@ public class CreateGameActivity extends AppCompatActivity {
         players.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                players_in_room.setText(snapshot.getChildrenCount() + "");
+                players_in_room.setText("Players: " + snapshot.getChildrenCount() + "/10");
                 if(snapshot.getChildrenCount() < 4 ){
                     startbutton.setEnabled(false);
+                    startbutton.setAlpha(0.8f);
                 }else{
                     // get all players as <String, String> (key: ID, value: Name) then adding to an ArrayList
                     for(DataSnapshot child: snapshot.getChildren()){
@@ -109,6 +112,7 @@ public class CreateGameActivity extends AppCompatActivity {
                                 child.getValue().toString()));
                     }
                     startbutton.setEnabled(true);
+                    startbutton.setAlpha(1);
                 }
             }
 

@@ -5,4 +5,5 @@
     <color name="colorAccent">#2ADA03</color>
     <color name="gray">#FFFFFF</color>
     <color name="semiTransparent">#80FFFFFF</color>
+    <color name="toolbarColor">#1AC505</color>
 </resources>

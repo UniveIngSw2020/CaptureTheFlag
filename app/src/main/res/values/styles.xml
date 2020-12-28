@@ -16,7 +16,7 @@
 
     <style name="Widget.AppTheme.ActionBar" parent="Widget.AppCompat.ActionBar.Solid">
         <!-- action bar background - without android prefix -->
-        <item name="background">@android:color/white</item>
+        <item name="background">@color/toolbarColor</item>
     </style>
 
     <style name="ThemeOverlay.AppTheme.ActionBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -31,7 +31,10 @@
         <item name="colorControlNormal">#000000</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" >
+        <item name="actionBarStyle">@style/Widget.AppTheme.ActionBar</item>
+        <item name="actionBarTheme">@style/ThemeOverlay.AppTheme.ActionBar</item>
+    </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 

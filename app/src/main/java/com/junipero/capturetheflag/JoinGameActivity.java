@@ -32,7 +32,7 @@ public class JoinGameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_join_game);
 
         TextView test = findViewById(R.id.joingametv);
-        test.setText("JOIN GAME");
+        test.setText("JOIN A LOBBY");
 
         final EditText edit_game = findViewById(R.id.inputidgame);
         final TextView wait_start = findViewById(R.id.waitstart);
@@ -67,7 +67,8 @@ public class JoinGameActivity extends AppCompatActivity {
                                                 Long.valueOf(snapshot.getChildrenCount()).toString() ,
                                                 Toast.LENGTH_SHORT).show();
                                          */
-                                        wait_start.setText("waiting to start the game...");
+                                        joinButton.setAlpha(0.6f);
+                                        wait_start.setText("Waiting the game to start...");
 
                                         // then check if the status changed into "Timer"
                                         lobby.child(edit_game.getText().toString())

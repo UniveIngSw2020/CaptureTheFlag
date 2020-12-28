@@ -21,7 +21,7 @@ public class CreateUserActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_user);
 
         TextView tv = findViewById(R.id.createusertv);
-        tv.setText("SONO NELLA USER CREATE ACTIVITY");
+        tv.setText("Insert your nickname");
 
         // this create the user's file if not exists in the local file manager ¯\_(ツ)_/¯
         final StoredDataManager sdm = new StoredDataManager(CreateUserActivity.this.getFilesDir());
@@ -29,11 +29,6 @@ public class CreateUserActivity extends AppCompatActivity {
         // finds the input field and button
         final EditText edit_name = findViewById(R.id.inputname);
         Button bt = findViewById(R.id.inputnamebutton);
-
-        // test for the stored data
-        Toast.makeText(CreateUserActivity.this,
-                sdm.readData().toString(),
-                Toast.LENGTH_LONG).show();
 
         // when the button is clicked create the user and set the fields, then write in the local file
         bt.setOnClickListener(new View.OnClickListener(){
