@@ -33,7 +33,7 @@ public class LocationUpdater {
         CTFCriteria ctfCriteria = new CTFCriteria();
         locationManager = (LocationManager)mContext.getSystemService(context);
         provider = locationManager.getBestProvider(ctfCriteria, true);
-        assert provider != null;
+        //assert provider != null;
         Location location = locationManager.getLastKnownLocation(provider);
         updateWithNewLocation(location);
         //activate the updates by the listener

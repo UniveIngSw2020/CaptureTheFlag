@@ -4,19 +4,54 @@ import java.io.File;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+
 import androidx.appcompat.widget.Toolbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.google.firebase.database.DatabaseReference;
+
 public class MainActivity extends AppCompatActivity {
+
+    private static final int STORAGE_PERMISSION_CODE = 101;
+
+    private class MyLocationListener implements LocationListener {
+        @Override
+        public void onLocationChanged(Location location) {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            // TODO Auto-generated method stub
+        }
+    }
 
 
     GameDB db = null;
@@ -28,6 +63,19 @@ public class MainActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Button button_create, button_join;
+        TextView welcome_msg = findViewById(R.id.welcome);
+
+        LocationManager lm = (LocationManager) getSystemService(Activity.LOCATION_SERVICE);
+
+        if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1,
+                    new MyLocationListener());
+        } else if (lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1,
+                    new MyLocationListener());
+        }
 
 
         //------------------FILE MANAGER-------------------------------
@@ -41,8 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
         // -------------------BUTTONS-------------------------------
 
-
-        Button button_create = findViewById(R.id.button_create);
+        button_create = findViewById(R.id.button_create);
         /*
         StoredDataManager sdm = new StoredDataManager(MainActivity.this.getFilesDir());
         if(! sdm.getUser().getName().equals("nasik")){
@@ -58,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button button_join = findViewById(R.id.button_join);
+        button_join = findViewById(R.id.button_join);
         button_join.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,13 +115,33 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+        // --------------------------------- GPS enabled? -----------------------------------------
+
+        if ( !lm.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            welcome_msg.setText("Your GPS is turned off.\n\nTurn it on now!");
+            // disable buttons
+            button_create.setVisibility(View.INVISIBLE);
+            button_join.setVisibility(View.INVISIBLE);
+
+            // show location settings page after 2 seconds 
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intent);
+                }
+            }, 2000);
+
+        }
+
+
         // ---------------LOCATION UPDATER-----------------
 
 
         checkLocationPermission();
 
         // needed to manage location data (only wrapped things)
-        LocationUpdater locationUpdater = new LocationUpdater(this);
+        //LocationUpdater locationUpdater = new LocationUpdater(this);
         // set the old location saved by the gps in the textView
         //myLocation.setText(locationUpdater.getActualPosition());
 
@@ -140,4 +207,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        recreate();
+    }
 }
