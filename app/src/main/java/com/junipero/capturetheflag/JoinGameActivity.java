@@ -25,6 +25,8 @@ import java.util.Iterator;
 
 public class JoinGameActivity extends AppCompatActivity {
 
+    DatabaseReference db;
+    String gameCode = "";
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,27 +39,29 @@ public class JoinGameActivity extends AppCompatActivity {
         final EditText edit_game = findViewById(R.id.inputidgame);
         final TextView wait_start = findViewById(R.id.waitstart);
         final Button joinButton = findViewById(R.id.joinbutton);
-        final DatabaseReference lobby = new GameDB().getDbRef();
+
+        db = new GameDB().getDbRef();
         final StoredDataManager me = new StoredDataManager(JoinGameActivity.this.getFilesDir());
 
         // join button event actions
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                lobby.addListenerForSingleValueEvent(new ValueEventListener() {
+                db.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         //checking if the lobby exists
                         if (snapshot.hasChild(edit_game.getText().toString())){
+                            gameCode = edit_game.getText().toString();
                             // the lobby room exists
-                            lobby.child(edit_game.getText().toString()).child("Players")
+                            db.child(edit_game.getText().toString()).child("Players")
                                     .addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     // if > 10 cannot enter
                                     if(snapshot.getChildrenCount() < 10){
                                         // inserting my info in players table in the db
-                                        lobby.child(edit_game.getText().toString()).child("Players")
+                                        db.child(edit_game.getText().toString()).child("Players")
                                                 .child(me.readID()).setValue(me.readName());
 
                                         //players.child(me.readID()).setValue(me.readName());
@@ -71,7 +75,7 @@ public class JoinGameActivity extends AppCompatActivity {
                                         wait_start.setText("Waiting the game to start...");
 
                                         // then check if the status changed into "Timer"
-                                        lobby.child(edit_game.getText().toString())
+                                        db.child(edit_game.getText().toString())
                                                 .child("State").addValueEventListener(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -120,5 +124,23 @@ public class JoinGameActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(!gameCode.equals("")){
+            StoredDataManager sdm = new StoredDataManager(JoinGameActivity.this.getFilesDir());
+            db.child(gameCode).child("Players").child(sdm.readID()).removeValue();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(!gameCode.equals("")){
+            StoredDataManager sdm = new StoredDataManager(JoinGameActivity.this.getFilesDir());
+            db.child(gameCode).child("Players").child(sdm.readID()).removeValue();
+        }
     }
 }

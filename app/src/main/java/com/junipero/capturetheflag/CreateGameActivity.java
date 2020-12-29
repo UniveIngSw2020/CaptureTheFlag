@@ -186,4 +186,10 @@ public class CreateGameActivity extends AppCompatActivity {
         super.onBackPressed();
         lobby.removeValue();
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        lobby.removeValue();
+    }
 }

@@ -19,13 +19,17 @@ import com.google.firebase.database.ValueEventListener;
 
 public class TimerActivity extends AppCompatActivity {
 
+    // array containing data of my game (gameCode, my role, my team color)
+    final String[] data = new String[3];
+    String gameCode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timer);
         final ConstraintLayout layout = findViewById(R.id.timerLayout);
         Intent i = getIntent();
-        final String gameCode = i.getStringExtra("gameCode");
+        gameCode = i.getStringExtra("gameCode");
 
         TextView gameCodeViewer = findViewById(R.id.GameID);
         gameCodeViewer.setText(Html.fromHtml("You are in lobby: <b>" + gameCode + "</b>"));
@@ -41,10 +45,8 @@ public class TimerActivity extends AppCompatActivity {
         teamViewer.setTextColor(Color.WHITE);
         timerViewer.setTextColor(Color.WHITE);
 
-        // array containing data of my game (gameCode, my role, my team color)
-        final String[] data = new String[3];
-        data[0] = gameCode;
 
+        data[0] = gameCode;
 
 
         // get your data from db
@@ -131,13 +133,20 @@ public class TimerActivity extends AppCompatActivity {
     // delete all data of current game stored in db
     @Override
     public void onBackPressed() {
-        // get the gameCode from the Intent
-        Intent i = getIntent();
-        String gameCode = i.getStringExtra("gameCode");
-        DatabaseReference db = new GameDB().getDbRef().child(gameCode);
+        DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
+        StoredDataManager sdm = new StoredDataManager(TimerActivity.this.getFilesDir());
         // then remove data
-        db.removeValue();
+        lobby.child(data[2]).child(data[1]).child(sdm.readID()).removeValue();
         finish();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
+        StoredDataManager sdm = new StoredDataManager(TimerActivity.this.getFilesDir());
+        // then remove data
+        lobby.child(data[2]).child(data[1]).child(sdm.readID()).removeValue();
+        finish();
+    }
 }
