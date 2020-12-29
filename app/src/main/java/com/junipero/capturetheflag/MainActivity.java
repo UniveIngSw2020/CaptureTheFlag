@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
             button_create.setVisibility(View.INVISIBLE);
             button_join.setVisibility(View.INVISIBLE);
 
-            // show location settings page after 2 seconds 
+            // show location settings page after 2 seconds
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -207,9 +207,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     @Override
     protected void onRestart() {
         super.onRestart();
         recreate();
     }
+
+
 }

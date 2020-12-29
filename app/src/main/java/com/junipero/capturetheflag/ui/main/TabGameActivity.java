@@ -3,6 +3,7 @@ package com.junipero.capturetheflag.ui.main;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
@@ -35,8 +36,11 @@ import com.junipero.capturetheflag.GameDB;
 import com.junipero.capturetheflag.R;
 import com.junipero.capturetheflag.ScoreActivity;
 
+import java.util.Objects;
+
 public class TabGameActivity extends Fragment implements SensorEventListener {
 
+    public Activity mActivity;
     private SensorManager mSensorManager;
     Sensor mSensorAccelerometer;
     Sensor mSensorMagnetometer;
@@ -65,6 +69,12 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
 
     double angleFromOtherFlag;
     double angleFromMyFlag;
+
+    String localState = "Running";
+
+    public TabGameActivity(){
+
+    }
 
     // just create the view, don't use it to initialize or execute your code
     // use onViewCreated instead :)
@@ -266,23 +276,9 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                                         location.getLongitude(), myFlagPos[0], myFlagPos[1]);
                                 distanceFromMyTeamFlagView.setText("Distance from\nmy team's flag:\n" + distanceFromMyFlag + " meters");
 
-                                // check if the game is ended
-                                if(snapshot.child("State").getValue().toString().equals("End")){
-                                    endGame(snapshot.child("Score").getValue().toString());
-                                }
 
-                                // check if the game has been cancelled
-                                else if(snapshot.child("State").getValue().toString().equals("Cancelled")){
-                                    endGame("Cancelled");
-                                }
-
-                                // Cancel the game if the numbers of player is too low
-                                else if(Integer.parseInt(snapshot.child("Number of players").getValue().toString()) < 4){
-                                    lobby.child("State").setValue("Cancelled");
-                                    endGame("Cancelled");
-                                } else {
                                     numberOfPlayers = Integer.parseInt(snapshot.child("Number of players").getValue().toString());
-                                }
+                                //}
 
                                 // check if actual distance from opposite team's flag is near to me
                                 if (distanceFromOtherFlag < 5) {
@@ -291,13 +287,13 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                                     if(status.equals(otherTeam + " is winning")){
                                         lobby.child("State").setValue("End");
                                         lobby.child("Score").setValue("Tie");
-                                        endGame("Tie");
+                                        //endGame("Tie");
                                     }
                                     // If my team is Winning so My team will WIN the game
                                     else if (status.equals(team + " is winning")){
                                         lobby.child("State").setValue("End");
                                         lobby.child("Score").setValue(team + " wins");
-                                        endGame(team + " wins");
+                                        //endGame(team + " wins");
                                     } else {
                                         // set state to my team os winning and re-check after
                                         lobby.child("State").setValue(team + " is winning");
@@ -313,7 +309,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
 
                         }
                     });
-                } else if (role.equals("Keeper")) {
+                } else if (role.equals("Keeper") && !localState.equals("End")) {
                     // just update position if my role is "Keeper"
                     myTeamFlagRef.child("Location").child("Latitude")
                             .setValue(location.getLatitude());
@@ -330,24 +326,15 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
 
                             if (snapshot.child("State").getValue() != null){
                                 // End the game when the state is set to END
-                                if(snapshot.child("State").getValue().toString().equals("End")){
-                                    endGame(snapshot.child("Score").getValue().toString());
+                                if(Objects.requireNonNull(snapshot.child("State").getValue())
+                                        .toString().equals("End")){
+                                    // fix to manage the onPause() method as the Keeper
+                                    localState = "End";
                                 }
-
-                                // check if the game has been cancelled
-                                else if(snapshot.child("State").getValue().toString().equals("Cancelled")){
-                                    endGame("Cancelled");
-                                }
-
-                                // Cancel the game if the numbers of player is too low
-                                else if(Integer.parseInt(snapshot.child("Number of players").getValue().toString()) < 4){
-                                    lobby.child("State").setValue("Cancelled");
-                                    endGame("Cancelled");
-                                } else {
-                                    numberOfPlayers = Integer.parseInt(snapshot.child("Number of players").getValue().toString());
-                                }
+                                numberOfPlayers = Integer.parseInt(Objects
+                                        .requireNonNull(snapshot.child("Number of players")
+                                                .getValue()).toString());
                             }
-
                         }
 
                         @Override
@@ -401,7 +388,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         lobby.child("Number of players").setValue(numberOfPlayers-1);
 
         // if the player is a "Keeper", if he left the game, the game is cancelled
-        if(role.equals("Keeper")){
+        if(role.equals("Keeper") && !localState.equals("End")){
             lobby.child("State").setValue("Cancelled");
         }
     }
@@ -499,17 +486,6 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
             ActivityCompat.requestPermissions(this.getActivity()
                     , new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 44);
         }
-    }
-
-    //---------------------------------------- END --------------------------------------------------
-
-    private void endGame(String score){
-        Intent i = new Intent(this.getActivity(), ScoreActivity.class);
-        i.putExtra("score", score);
-        i.putExtra("team", team);
-        i.putExtra("gameCode", gameCode);
-        startActivity(i);
-        getActivity().finish();
     }
 
     //------------------------------------------------------------------------------------------

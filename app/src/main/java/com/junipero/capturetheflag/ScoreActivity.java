@@ -76,9 +76,11 @@ public class ScoreActivity extends AppCompatActivity {
                 assert gameCode != null;
                 DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
                 lobby.removeValue();
-
+                /*
                 startActivity(new Intent(ScoreActivity.this,
                         MainActivity.class));
+
+                 */
                 finish();
             }
         }, 3000);
