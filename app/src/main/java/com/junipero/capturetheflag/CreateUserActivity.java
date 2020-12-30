@@ -34,12 +34,18 @@ public class CreateUserActivity extends AppCompatActivity {
         bt.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                LocalUser user = new LocalUser();
-                user.setId(IdGenerator.generatePlayerId());
-                user.setScore(0, 0, 0);
-                user.setName(edit_name.getText().toString());
-                sdm.writeFile(user);
-                finish();
+                if(!edit_name.getText().toString().equals("")){
+                    LocalUser user = new LocalUser();
+                    user.setId(IdGenerator.generatePlayerId());
+                    user.setScore(0, 0, 0);
+                    user.setName(edit_name.getText().toString());
+                    sdm.writeFile(user);
+                    finish();
+                }else{
+                    Toast.makeText(CreateUserActivity.this,
+                            "Please insert a new nickname", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 

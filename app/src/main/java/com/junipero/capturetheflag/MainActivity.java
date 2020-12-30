@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -30,6 +31,8 @@ import com.google.firebase.database.DatabaseReference;
 public class MainActivity extends AppCompatActivity {
 
     private static final int STORAGE_PERMISSION_CODE = 101;
+    MediaPlayer player;
+    Intent svc;
 
     private class MyLocationListener implements LocationListener {
         @Override
@@ -76,6 +79,20 @@ public class MainActivity extends AppCompatActivity {
             lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1,
                     new MyLocationListener());
         }
+
+/*
+        player = MediaPlayer.create(MainActivity.this,R.raw.awesomeness);
+        player.setLooping(true);
+        player.setVolume(100,100);
+        player.start();
+
+ */
+
+
+
+
+        svc = new Intent(this, BackgroundSoundService.class);
+        startService(svc);
 
 
         //------------------FILE MANAGER-------------------------------
@@ -212,6 +229,53 @@ public class MainActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
         recreate();
+    }
+
+    /* V1
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (this.isFinishing()){
+            player.stop();
+        }
+    }
+
+     */
+/*
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+            if (isFinishing()){
+                player.stop();
+                player.release();
+            }
+
+    }
+
+ */
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        //stopService(svc);
+        //ring.stop();
+    }
+
+
+    @Override
+    public void onBackPressed() {
+
+        // if there are better ways to stop music after closing the app,
+        // contact me at monan.nasir@gmail.com ¯\_(ツ)_/¯
+
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                onDestroy();
+            }
+        }, 200);
+        super.onBackPressed();
     }
 
 
