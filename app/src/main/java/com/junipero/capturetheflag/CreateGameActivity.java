@@ -1,8 +1,12 @@
 package com.junipero.capturetheflag;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Html;
 import android.util.Pair;
 import android.view.View;
@@ -65,6 +69,18 @@ public class CreateGameActivity extends AppCompatActivity {
         // uncomment lately to use random rooms
         gameCode = IdGenerator.generateMatchId();
         gameId.setText(Html.fromHtml("The code for your lobby is: " + "<b>"+gameCode+"</b>"));
+
+        // if not connected to internet return in Main screen
+        if(!isNetworkConnected()){
+            gameId.setText("Internet connection is not enabled");
+            startbutton.setEnabled(false);
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    finish();
+                }
+            }, 2000);
+        }
 
 
         /* DEBUG room
@@ -179,6 +195,12 @@ public class CreateGameActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    // internet connection checker
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
 
     @Override

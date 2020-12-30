@@ -5,9 +5,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -33,12 +37,27 @@ public class JoinGameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join_game);
 
-        TextView test = findViewById(R.id.joingametv);
-        test.setText("JOIN A LOBBY");
+        TextView joinTitle = findViewById(R.id.joingametv);
+        joinTitle.setText("JOIN A LOBBY");
 
         final EditText edit_game = findViewById(R.id.inputidgame);
         final TextView wait_start = findViewById(R.id.waitstart);
         final Button joinButton = findViewById(R.id.joinbutton);
+        final TextView labelTitle = findViewById(R.id.inputidgamelabel) ;
+
+        // if not connected to internet return in Main screen
+        if(!isNetworkConnected()){
+            joinTitle.setText("Internet connection is not enabled");
+            joinButton.setEnabled(false);
+            labelTitle.setVisibility(View.INVISIBLE);
+            edit_game.setVisibility(View.INVISIBLE);
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    finish();
+                }
+            }, 2000);
+        }
 
         db = new GameDB().getDbRef();
         final StoredDataManager me = new StoredDataManager(JoinGameActivity.this.getFilesDir());
@@ -124,6 +143,12 @@ public class JoinGameActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    // internet connection checker
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
 
     @Override
