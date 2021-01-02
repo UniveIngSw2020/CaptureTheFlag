@@ -212,6 +212,6 @@ public class CreateGameActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        lobby.removeValue();
+        //lobby.removeValue();
     }
 }

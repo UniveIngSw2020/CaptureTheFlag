@@ -17,6 +17,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import java.sql.Time;
+
 public class TimerActivity extends AppCompatActivity {
 
     // array containing data of my game (gameCode, my role, my team color)
@@ -116,11 +118,14 @@ public class TimerActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 //timerViewer.setText("Let's start!");
+                StoredDataManager sdm = new StoredDataManager(TimerActivity.this.getFilesDir());
                 // starts the GameActivity after the countdown
                 Intent i = new Intent(TimerActivity.this, GameActivity.class);
                 i.putExtra("gameCode", data[0]);
                 i.putExtra("role", data[1]);
                 i.putExtra("team", data[2]);
+                i.putExtra("id", sdm.getUser().getId());
+                i.putExtra("name", sdm.getUser().getName());
                 startActivity(i);
                 finish();
 
@@ -146,7 +151,8 @@ public class TimerActivity extends AppCompatActivity {
         DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
         StoredDataManager sdm = new StoredDataManager(TimerActivity.this.getFilesDir());
         // then remove data
-        lobby.child(data[2]).child(data[1]).child(sdm.readID()).removeValue();
+        // need to fix
+        //lobby.child(data[2]).child(data[1]).child(sdm.readID()).removeValue();
         finish();
     }
 }
