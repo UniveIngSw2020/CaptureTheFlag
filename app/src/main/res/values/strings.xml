@@ -15,7 +15,7 @@
     <string name="action_settings">Settings</string>
     <string name="toolbar">CTF</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="profile_fragment">PROFILE FRAGMENT</string>
+    <string name="profile_fragment">YOUR PROFILE</string>
     <string name="settings_fragment">JUNIPERO TEAM</string>
     <string name="large_text">
         "GUIDE FRAGMENT.\n\n"
@@ -141,4 +141,6 @@
     <string name="id">ID:</string>
     <string name="wins">Wins:</string>
     <string name="nickname">Nickname:</string>
+    <string name="send">Send</string>
+    <string name="send_a_message">Send a message</string>
 </resources>

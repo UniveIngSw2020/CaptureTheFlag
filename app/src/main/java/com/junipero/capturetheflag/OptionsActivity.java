@@ -111,6 +111,7 @@ public class OptionsActivity extends AppCompatActivity {
                     sdm.changeUsername(changeNicknameEdit.getText().toString());
                     Toast.makeText(OptionsActivity.this,
                             "Your nickname has been changed", Toast.LENGTH_SHORT).show();
+                    changeNicknameEdit.setText("");
                 }else{
                     Toast.makeText(OptionsActivity.this,
                             "Please insert a new nickname", Toast.LENGTH_SHORT).show();

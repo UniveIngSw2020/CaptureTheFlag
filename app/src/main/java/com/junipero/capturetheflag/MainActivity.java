@@ -33,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int STORAGE_PERMISSION_CODE = 101;
     MediaPlayer player;
     Intent svc;
+    LocationManager lm;
+    TextView welcome_msg;
+    Button button_create, button_join;
 
     private class MyLocationListener implements LocationListener {
         @Override
@@ -67,18 +70,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button button_create, button_join;
-        TextView welcome_msg = findViewById(R.id.welcome);
+        welcome_msg = findViewById(R.id.welcome);
 
-        LocationManager lm = (LocationManager) getSystemService(Activity.LOCATION_SERVICE);
+        lm = (LocationManager) getSystemService(Activity.LOCATION_SERVICE);
 
-        if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1,
-                    new MyLocationListener());
-        } else if (lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1,
-                    new MyLocationListener());
-        }
+
 
 /*
         player = MediaPlayer.create(MainActivity.this,R.raw.awesomeness);
@@ -87,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
         player.start();
 
  */
-
 
 
 
@@ -132,6 +127,25 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+        // ---------------LOCATION UPDATER-----------------
+
+
+        checkLocationPermission();
+
+        if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1,
+                    new MyLocationListener());
+        } else if (lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1,
+                    new MyLocationListener());
+        }
+
+        // needed to manage location data (only wrapped things)
+        //LocationUpdater locationUpdater = new LocationUpdater(this);
+        // set the old location saved by the gps in the textView
+        //myLocation.setText(locationUpdater.getActualPosition());
+
+
         // --------------------------------- GPS enabled? -----------------------------------------
 
         if ( !lm.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
@@ -150,18 +164,6 @@ public class MainActivity extends AppCompatActivity {
             }, 2000);
 
         }
-
-
-        // ---------------LOCATION UPDATER-----------------
-
-
-        checkLocationPermission();
-
-        // needed to manage location data (only wrapped things)
-        //LocationUpdater locationUpdater = new LocationUpdater(this);
-        // set the old location saved by the gps in the textView
-        //myLocation.setText(locationUpdater.getActualPosition());
-
 
 
         // ----------------- DATABASE MANAGER ---------------------------

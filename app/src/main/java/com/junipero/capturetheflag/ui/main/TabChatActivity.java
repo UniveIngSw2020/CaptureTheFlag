@@ -3,17 +3,17 @@ package com.junipero.capturetheflag.ui.main;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.database.ChildEventListener;
@@ -25,13 +25,13 @@ import com.junipero.capturetheflag.R;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class TabChatActivity extends Fragment {
 
     Intent i;
     String gameCode, role, team, id, name, temp_key;
     TextView chat_msg;
+    ScrollView scrollChat;
 
     @Override
     public View onCreateView(
@@ -63,6 +63,7 @@ public class TabChatActivity extends Fragment {
         final EditText input_msg = view.findViewById(R.id.inputMsg);
         Button send_btn = view.findViewById(R.id.sendBtn);
         chat_msg = view.findViewById(R.id.msgView);
+        scrollChat = view.findViewById(R.id.scrollChat);
 
         final DatabaseReference room = new GameDB().getDbRef().child(gameCode + "/" + team + "/Chat");
 
@@ -85,6 +86,8 @@ public class TabChatActivity extends Fragment {
 
             }
         });
+
+        chat_msg.setText(Html.fromHtml("<b> Team " + team + "</b>: Welcome here!"));
 
         room.addChildEventListener(new ChildEventListener() {
             @Override
@@ -117,13 +120,20 @@ public class TabChatActivity extends Fragment {
 
     private void append_chat_conversation (DataSnapshot snapshot){
         String name = "", msg = "";
-            //for (DataSnapshot values : ds.getChildren())
-            if(snapshot.child("Name").getValue() != null &&
-                    snapshot.child("Message").getValue() != null) {
-                name = snapshot.child("Name").getValue().toString();
-                msg = snapshot.child("Message").getValue().toString();
-                chat_msg.append(name + ": " + msg + "\n");
-            }
+        if(snapshot.child("Name").getValue() != null &&
+                snapshot.child("Message").getValue() != null) {
+            name = snapshot.child("Name").getValue().toString();
+            msg = snapshot.child("Message").getValue().toString();
+            chat_msg.append(Html.fromHtml("<br/><b>" + name + "</b>: " + msg));
+
+            scrollChat.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    scrollChat.fullScroll(ScrollView.FOCUS_DOWN);
+                }
+            },500);
+
+        }
 
     }
 

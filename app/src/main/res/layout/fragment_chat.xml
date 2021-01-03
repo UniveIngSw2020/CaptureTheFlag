@@ -5,6 +5,7 @@
     android:id="@+id/chatLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:windowSoftInputMode="adjustResize"
     tools:context=".ChatFragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -12,47 +13,66 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <EditText
-            android:id="@+id/inputMsg"
-            android:layout_width="273dp"
-            android:layout_height="40dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.246"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.969" />
-
-        <Button
-            android:id="@+id/sendBtn"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Send"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.95"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.971" />
+            app:layout_constraintVertical_bias="1.0">
+
+            <EditText
+                android:id="@+id/inputMsg"
+                android:layout_width="282dp"
+                android:layout_height="39dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="15dp"
+                android:layout_gravity="bottom"
+                android:backgroundTint="#FFFFFF"
+                android:ems="10"
+                android:hint="@string/send_a_message"
+                android:importantForAutofill="no"
+                android:inputType="textPersonName"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#BFFFFFFF" />
+
+            <Button
+                android:id="@+id/sendBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:backgroundTint="#FFFFFF"
+                android:text="@string/send" />
+
+        </LinearLayout>
 
         <ScrollView
-            android:id="@+id/scrollView2"
-            android:layout_width="358dp"
-            android:layout_height="515dp"
-            app:layout_constraintBottom_toTopOf="@+id/inputMsg"
+            android:id="@+id/scrollChat"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="50dp"
+            android:transcriptMode="alwaysScroll"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.49"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.766">
+            app:layout_constraintVertical_bias="0.0">
 
             <TextView
                 android:id="@+id/msgView"
-                android:layout_width="match_parent"
+                android:layout_width="385dp"
                 android:layout_height="wrap_content"
-                android:textSize="18sp" />
+                android:layout_marginStart="13dp"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                app:lineHeight="30dp" />
         </ScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
