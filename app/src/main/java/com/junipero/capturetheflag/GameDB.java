@@ -34,8 +34,11 @@ public class GameDB {
 
                  */
 
+                /*
                 Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
                 Log.d(TAG, "Value is: " + map);
+
+                 */
 
 
             }

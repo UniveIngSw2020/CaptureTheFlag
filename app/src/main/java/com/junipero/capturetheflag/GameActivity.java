@@ -33,7 +33,7 @@ import java.util.Objects;
 
 public class GameActivity extends AppCompatActivity {
     public SensorManager cSesnor;
-    String gameCode, role, team;
+    String gameCode, role, team, numOfPlayers;
 
     @SuppressLint("UseCompatLoadingForDrawables")
     @Override
@@ -65,6 +65,7 @@ public class GameActivity extends AppCompatActivity {
         lobby.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // state of game controller
                 if (snapshot.child("State").getValue() != null) {
                     if (Objects.requireNonNull(snapshot.child("State").getValue()).toString().equals("End")) {
                         endGame(Objects.requireNonNull(snapshot.child("Score").getValue()).toString());
@@ -81,6 +82,13 @@ public class GameActivity extends AppCompatActivity {
                         endGame("Cancelled");
                     }
                 }
+
+                // num of players controller
+                if (snapshot.child("Number of players").getValue() != null) {
+                    numOfPlayers = snapshot.child("Number of players").getValue().toString();
+                }
+
+
             }
 
             @Override
@@ -105,8 +113,18 @@ public class GameActivity extends AppCompatActivity {
         i.putExtra("score", score);
         i.putExtra("team", team);
         i.putExtra("gameCode", gameCode);
+        i.putExtra("numOfPlayers", numOfPlayers);
+        i.putExtra("role", role);
         startActivity(i);
         finish();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        // if you levae the game your score will be losts +1
+        endGame((team.equals("Red")) ? "Blue" : "Red" + " wins");
+
+    }
 }

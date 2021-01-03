@@ -78,7 +78,8 @@ public class JoinGameActivity extends AppCompatActivity {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     // if > 10 cannot enter
-                                    if(snapshot.getChildrenCount() < 10){
+                                    if(snapshot.getChildrenCount() < 10 &&
+                                            !snapshot.child(gameCode + "/State").getValue().toString().equals("Timer")){
                                         // inserting my info in players table in the db
                                         db.child(edit_game.getText().toString()).child("Players")
                                                 .child(me.readID()).setValue(me.readName());
@@ -114,7 +115,9 @@ public class JoinGameActivity extends AppCompatActivity {
                                             }
                                         });
                                     }else{
-                                        Toast.makeText(JoinGameActivity.this, "Room is currently full", Toast.LENGTH_SHORT)
+                                        Toast.makeText(JoinGameActivity.this,
+                                                "Room is currently full or already started",
+                                                Toast.LENGTH_SHORT)
                                                 .show();
                                     }
                                 }

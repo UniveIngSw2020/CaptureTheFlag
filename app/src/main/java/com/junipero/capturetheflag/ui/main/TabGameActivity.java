@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -309,7 +310,8 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
 
                         }
                     });
-                } else if (role.equals("Keeper") && !localState.equals("End")) {
+                } else if (role.equals("Keeper") && !localState.equals("End") &&
+                        !localState.equals("Cancelled")) {
                     // just update position if my role is "Keeper"
                     myTeamFlagRef.child("Location").child("Latitude")
                             .setValue(location.getLatitude());
@@ -330,6 +332,9 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                                         .toString().equals("End")){
                                     // fix to manage the onPause() method as the Keeper
                                     localState = "End";
+                                }else if(Objects.requireNonNull(snapshot.child("State").getValue())
+                                        .toString().equals("Cancelled")){
+                                    localState = "Cancelled";
                                 }
                                 numberOfPlayers = Integer.parseInt(Objects
                                         .requireNonNull(snapshot.child("Number of players")
