@@ -20,15 +20,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
 
 import com.google.firebase.database.DatabaseReference;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     private static final int STORAGE_PERMISSION_CODE = 101;
     MediaPlayer player;
@@ -279,6 +283,5 @@ public class MainActivity extends AppCompatActivity {
         }, 200);
         super.onBackPressed();
     }
-
 
 }

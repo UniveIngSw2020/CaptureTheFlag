@@ -24,6 +24,9 @@ public class TimerActivity extends AppCompatActivity {
     // array containing data of my game (gameCode, my role, my team color)
     final String[] data = new String[3];
     String gameCode;
+    boolean isChangingActivity = false;
+    boolean isGoingBackground = false;
+    int numOfPlayers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +102,13 @@ public class TimerActivity extends AppCompatActivity {
                     }
                 }
 
+                // need to repeat this step in createGame & Join
+                if(snapshot.getValue() != null){
+                    numOfPlayers = Integer.parseInt(snapshot.child("Number of players")
+                            .getValue().toString());
+                }
+
+
             }
 
             @Override
@@ -108,7 +118,7 @@ public class TimerActivity extends AppCompatActivity {
         });
 
         // Countdown 1 minute
-        new CountDownTimer(5000, 1000){
+        new CountDownTimer(10000, 1000){
             @SuppressLint("SetTextI18n")
             public void onTick(long millisUntilFinished) {
                 timerViewer.setText((millisUntilFinished / 1000) + "");
@@ -117,6 +127,7 @@ public class TimerActivity extends AppCompatActivity {
             @SuppressLint("SetTextI18n")
             @Override
             public void onFinish() {
+                isChangingActivity = true;
                 //timerViewer.setText("Let's start!");
                 StoredDataManager sdm = new StoredDataManager(TimerActivity.this.getFilesDir());
                 // starts the GameActivity after the countdown
@@ -126,7 +137,9 @@ public class TimerActivity extends AppCompatActivity {
                 i.putExtra("team", data[2]);
                 i.putExtra("id", sdm.getUser().getId());
                 i.putExtra("name", sdm.getUser().getName());
-                startActivity(i);
+                if (!isGoingBackground){
+                    startActivity(i);
+                }
                 finish();
 
             }
@@ -148,11 +161,22 @@ public class TimerActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
-        StoredDataManager sdm = new StoredDataManager(TimerActivity.this.getFilesDir());
-        // then remove data
-        // need to fix
-        //lobby.child(data[2]).child(data[1]).child(sdm.readID()).removeValue();
-        finish();
+
+        if(!isChangingActivity){
+            isGoingBackground = true;
+            DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
+
+            if(data[1].equals("Keeper")){
+                // delete the game
+                lobby.child("State").setValue("Cancelled");
+            }
+
+            StoredDataManager sdm = new StoredDataManager(TimerActivity.this.getFilesDir());
+            lobby.child(data[2]).child(data[1]).child(sdm.readID()).removeValue();
+            numOfPlayers = numOfPlayers -1;
+            lobby.child("Number of players").setValue(numOfPlayers);
+            finish();
+        }
+
     }
 }
