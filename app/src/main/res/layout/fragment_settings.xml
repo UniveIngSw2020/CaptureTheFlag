@@ -14,21 +14,25 @@
 
         <TextView
             android:id="@+id/textView"
-            android:layout_width="123dp"
+            android:layout_width="222dp"
             android:layout_height="20dp"
             android:text="@string/settings_fragment"
             android:textAlignment="center"
+            android:textColor="#A9FFFFFF"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.849" />
+            app:layout_constraintVertical_bias="0.95" />
 
-        <Switch
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/soundSwitch"
             android:layout_width="319dp"
             android:layout_height="30dp"
-            android:text="Sound ON/OFF"
+            android:backgroundTint="#FAFAFA"
+            android:text="@string/sound_on_off"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -40,20 +44,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Insert new nickname"
+            android:hint="@string/insert_new_nickname"
             android:inputType="textPersonName"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.497"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.24" />
+            app:layout_constraintVertical_bias="0.24"
+            android:autofillHints="" />
 
         <Button
             android:id="@+id/changeNicknameButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Change name"
+            android:text="@string/change_name"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.649"

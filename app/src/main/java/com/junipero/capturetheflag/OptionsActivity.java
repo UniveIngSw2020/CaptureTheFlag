@@ -1,6 +1,7 @@
 package com.junipero.capturetheflag;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 
 import android.annotation.SuppressLint;
 import android.app.VoiceInteractor;
@@ -27,8 +28,7 @@ public class OptionsActivity extends AppCompatActivity {
     TextView idView, nameView, winsView, lostsView, tiesView;
 
     //views of settings fragment
-    @SuppressLint("UseSwitchCompatOrMaterialCode")
-    Switch soundToggle;
+    SwitchCompat soundToggle;
     EditText changeNicknameEdit;
     Button changeNicknameButton;
 
