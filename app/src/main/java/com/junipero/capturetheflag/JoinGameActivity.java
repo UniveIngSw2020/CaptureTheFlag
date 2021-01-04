@@ -31,6 +31,8 @@ public class JoinGameActivity extends AppCompatActivity {
 
     DatabaseReference db;
     String gameCode = "";
+    private boolean isChangingActivity = false;
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,17 +71,19 @@ public class JoinGameActivity extends AppCompatActivity {
                 db.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        //checking if the lobby exists
-                        if (snapshot.hasChild(edit_game.getText().toString())){
-                            gameCode = edit_game.getText().toString();
+                        //checking if the lobby exists and the game is not started yet
+                        gameCode = edit_game.getText().toString();
+                        if (snapshot.hasChild(gameCode) && snapshot.child(gameCode).child("State")
+                                .getValue() != null && snapshot.child(gameCode).child("State")
+                                .getValue().toString().equals("Waiting for start")){
+
                             // the lobby room exists
                             db.child(edit_game.getText().toString()).child("Players")
                                     .addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     // if > 10 cannot enter
-                                    if(snapshot.getChildrenCount() < 10 &&
-                                            !snapshot.child(gameCode + "/State").getValue().toString().equals("Timer")){
+                                    if(snapshot.getChildrenCount() < 10) {
                                         // inserting my info in players table in the db
                                         db.child(edit_game.getText().toString()).child("Players")
                                                 .child(me.readID()).setValue(me.readName());
@@ -102,8 +106,10 @@ public class JoinGameActivity extends AppCompatActivity {
                                                 // here's the checker, then start the Timer activity
                                                 if (snapshot.getValue().toString().equals("Timer")){
                                                     // when State is set to TIMER, switch to TimerActivity
-                                                    Intent i = new Intent(JoinGameActivity.this, TimerActivity.class);
+                                                    Intent i = new Intent(JoinGameActivity.this,
+                                                            TimerActivity.class);
                                                     i.putExtra("gameCode", edit_game.getText().toString());
+                                                    isChangingActivity = true;
                                                     startActivity(i);
                                                     finish();
                                                 }
@@ -116,9 +122,8 @@ public class JoinGameActivity extends AppCompatActivity {
                                         });
                                     }else{
                                         Toast.makeText(JoinGameActivity.this,
-                                                "Room is currently full or already started",
-                                                Toast.LENGTH_SHORT)
-                                                .show();
+                                                "Room is currently full",
+                                                Toast.LENGTH_SHORT).show();
                                     }
                                 }
 
@@ -131,8 +136,9 @@ public class JoinGameActivity extends AppCompatActivity {
 
                         }else{
                             //
-                            Toast.makeText(JoinGameActivity.this, "Room not found ¯\\_(ツ)_/¯", Toast.LENGTH_SHORT)
-                                    .show();
+                            Toast.makeText(JoinGameActivity.this,
+                                    "Room not found ¯\\_(ツ)_/¯ or the game is already started",
+                                    Toast.LENGTH_SHORT).show();
                             // the join button will be available for next code of lobby
                         }
                     }
@@ -166,9 +172,11 @@ public class JoinGameActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if(!gameCode.equals("")){
+        if(!gameCode.equals("") && !isChangingActivity){
             StoredDataManager sdm = new StoredDataManager(JoinGameActivity.this.getFilesDir());
+            // remove myself from the lobby
             db.child(gameCode).child("Players").child(sdm.readID()).removeValue();
+            finish();
         }
     }
 }

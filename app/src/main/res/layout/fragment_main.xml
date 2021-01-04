@@ -21,7 +21,7 @@
         app:srcCompat="@drawable/bg_flag" />
 
     <TextView
-        android:id="@+id/degreeView"
+        android:id="@+id/team_role_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FFFFFF"

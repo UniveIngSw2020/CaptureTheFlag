@@ -34,7 +34,7 @@ public class CreateGameActivity extends AppCompatActivity {
 
     private String gameCode;
     private DatabaseReference lobby;
-
+    private boolean isChangingActivity = false;
 
 
     // declaration of a Quadruple class
@@ -187,6 +187,7 @@ public class CreateGameActivity extends AppCompatActivity {
                 Intent i = new Intent(CreateGameActivity.this, TimerActivity.class);
                 i.putExtra("gameCode", gameCode);
                 lobby.child("State").setValue("in Game");
+                isChangingActivity = true;
                 startActivity(i);
                 finish();
 
@@ -210,6 +211,12 @@ public class CreateGameActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        //lobby.removeValue();
+
+        if(!isChangingActivity){
+            DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
+            // delete the game
+            lobby.removeValue();
+            finish();
+        }
     }
 }

@@ -102,7 +102,6 @@ public class TimerActivity extends AppCompatActivity {
                     }
                 }
 
-                // need to repeat this step in createGame & Join
                 if(snapshot.getValue() != null){
                     numOfPlayers = Integer.parseInt(snapshot.child("Number of players")
                             .getValue().toString());
@@ -167,7 +166,7 @@ public class TimerActivity extends AppCompatActivity {
             DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
 
             if(data[1].equals("Keeper")){
-                // delete the game
+                // cancel the game
                 lobby.child("State").setValue("Cancelled");
             }
 
