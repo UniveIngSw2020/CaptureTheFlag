@@ -92,11 +92,6 @@ public class MainActivity extends AppCompatActivity{
          */
 
 
-
-
-
-
-
         /*
         svc = new Intent(this, BackgroundSoundService.class);
         startService(svc);

@@ -75,7 +75,8 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 // state of game controller
-                if (snapshot.child("State").getValue() != null) {
+                // isGoingBack used to end the game just for a single instance
+                if (snapshot.child("State").getValue() != null && !isGoingBack) {
                     if (Objects.requireNonNull(snapshot.child("State").getValue()).toString().equals("End")) {
                         endGame(Objects.requireNonNull(snapshot.child("Score").getValue()).toString());
                     }

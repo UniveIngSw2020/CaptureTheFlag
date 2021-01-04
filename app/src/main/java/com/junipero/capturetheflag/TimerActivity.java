@@ -7,6 +7,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.Html;
@@ -26,8 +27,8 @@ public class TimerActivity extends AppCompatActivity {
     String gameCode;
     boolean isChangingActivity = false;
     boolean isGoingBackground = false;
-    private boolean isGoingBack = false;
     int numOfPlayers;
+    private MediaPlayer tick;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,8 @@ public class TimerActivity extends AppCompatActivity {
         final ConstraintLayout layout = findViewById(R.id.timerLayout);
         Intent i = getIntent();
         gameCode = i.getStringExtra("gameCode");
+        // stop the music to reproduce sound fx of this activity
+        stopService(new Intent(TimerActivity.this, BackgroundSoundService.class));
 
         TextView gameCodeViewer = findViewById(R.id.GameID);
         gameCodeViewer.setText(Html.fromHtml("You are in lobby: <b>" + gameCode + "</b>"));
@@ -117,8 +120,12 @@ public class TimerActivity extends AppCompatActivity {
             }
         });
 
+        tick = MediaPlayer.create(TimerActivity.this,R.raw.tick);
+        tick.setLooping(true);
+        tick.setVolume(70,70);
+        tick.start();
         // Countdown 1 minute
-        new CountDownTimer(10000, 1000){
+        new CountDownTimer(5000, 1000){
             @SuppressLint("SetTextI18n")
             public void onTick(long millisUntilFinished) {
                 timerViewer.setText((millisUntilFinished / 1000) + "");
@@ -151,7 +158,6 @@ public class TimerActivity extends AppCompatActivity {
     // delete all data of current game stored in db
     @Override
     public void onBackPressed() {
-        isGoingBack = true;
         DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
         StoredDataManager sdm = new StoredDataManager(TimerActivity.this.getFilesDir());
         // then remove data
@@ -163,9 +169,8 @@ public class TimerActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         // if the app is in background stop the music
-        if(!isGoingBack){
-            stopService(new Intent(TimerActivity.this, BackgroundSoundService.class));
-        }
+        tick.stop();
+        tick.release();
 
         if(!isChangingActivity){
             isGoingBackground = true;
