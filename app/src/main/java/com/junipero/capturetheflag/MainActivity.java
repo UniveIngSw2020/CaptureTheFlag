@@ -6,6 +6,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -35,11 +36,12 @@ import com.google.firebase.database.DatabaseReference;
 public class MainActivity extends AppCompatActivity{
 
     private static final int STORAGE_PERMISSION_CODE = 101;
-    MediaPlayer player;
-    Intent svc;
-    LocationManager lm;
-    TextView welcome_msg;
-    Button button_create, button_join;
+    private MediaPlayer player;
+    private Intent svc;
+    private LocationManager lm;
+    private TextView welcome_msg;
+    private Button button_create, button_join;
+    private boolean isGoingToBackground = true;
 
     private class MyLocationListener implements LocationListener {
         @Override
@@ -78,20 +80,28 @@ public class MainActivity extends AppCompatActivity{
 
         lm = (LocationManager) getSystemService(Activity.LOCATION_SERVICE);
 
-
-
-/*
+        /*
         player = MediaPlayer.create(MainActivity.this,R.raw.awesomeness);
         player.setLooping(true);
-        player.setVolume(100,100);
-        player.start();
+        player.setVolume(50,50);
+        if(!player.isPlaying()){
+                player.start();
+            }
+        }
 
- */
+         */
 
 
 
+
+
+
+
+        /*
         svc = new Intent(this, BackgroundSoundService.class);
         startService(svc);
+
+         */
 
 
         //------------------FILE MANAGER-------------------------------
@@ -116,6 +126,7 @@ public class MainActivity extends AppCompatActivity{
         button_create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isGoingToBackground = false;
                 startActivity(new Intent(MainActivity.this,
                         CreateGameActivity.class));
             }
@@ -125,6 +136,7 @@ public class MainActivity extends AppCompatActivity{
         button_join.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isGoingToBackground = false;
                 startActivity(new Intent(MainActivity.this,
                         JoinGameActivity.class));
             }
@@ -218,6 +230,7 @@ public class MainActivity extends AppCompatActivity{
     private void moveToOption (int id){
         Intent i = new Intent(MainActivity.this, OptionsActivity.class);
         i.putExtra("option", id);
+        isGoingToBackground = false; // used to not stop the music
         startActivity(i);
     }
 
@@ -234,54 +247,26 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onRestart() {
         super.onRestart();
+        // needed for permission checkers
         recreate();
-    }
 
-    /* V1
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (this.isFinishing()){
-            player.stop();
+        SharedPreferences sp = getSharedPreferences("SoundSettings", MODE_PRIVATE);
+        if (sp.getBoolean("isActive", true)){
+            startService(new Intent(MainActivity.this, BackgroundSoundService.class));
         }
     }
 
-     */
-/*
+
     @Override
     protected void onPause() {
         super.onPause();
-
-            if (isFinishing()){
-                player.stop();
-                player.release();
-            }
-
-    }
-
- */
-
-    @Override
-    protected void onStop() {
-        super.onStop();
+        // if the app is in background stop the music
+        if(isGoingToBackground){
+           stopService(new Intent(MainActivity.this, BackgroundSoundService.class));
+        }
         //stopService(svc);
-        //ring.stop();
     }
 
 
-    @Override
-    public void onBackPressed() {
-
-        // if there are better ways to stop music after closing the app,
-        // contact me at monan.nasir@gmail.com ¯\_(ツ)_/¯
-
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                onDestroy();
-            }
-        }, 200);
-        super.onBackPressed();
-    }
 
 }

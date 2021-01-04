@@ -132,7 +132,7 @@
     <string name="nickname">Nickname:</string>
     <string name="send">Send</string>
     <string name="send_a_message">Send a message</string>
-    <string name="sound_on_off">Sound ON/OFF</string>
+    <string name="sound_on_off">Sound OFF/ON</string>
     <string name="insert_new_nickname">Insert new nickname</string>
     <string name="change_name">Change name</string>
 </resources>

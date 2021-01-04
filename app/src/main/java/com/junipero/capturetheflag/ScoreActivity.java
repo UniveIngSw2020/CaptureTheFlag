@@ -17,6 +17,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 public class ScoreActivity extends AppCompatActivity {
+    private boolean isGoingBack = false;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -83,5 +84,19 @@ public class ScoreActivity extends AppCompatActivity {
                 finish();
             }
         }, 3000);
+    }
+
+    @Override
+    public void onBackPressed() {
+        isGoingBack = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // if go back, no need to stop music, else stop
+        if(!isGoingBack){
+            stopService(new Intent(ScoreActivity.this, BackgroundSoundService.class));
+        }
     }
 }

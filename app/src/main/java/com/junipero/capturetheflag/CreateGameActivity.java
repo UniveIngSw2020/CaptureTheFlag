@@ -35,6 +35,7 @@ public class CreateGameActivity extends AppCompatActivity {
     private String gameCode;
     private DatabaseReference lobby;
     private boolean isChangingActivity = false;
+    private boolean isGoingToBackground = true;
 
 
     // declaration of a Quadruple class
@@ -207,18 +208,25 @@ public class CreateGameActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        lobby.removeValue();
+        isGoingToBackground = false;
+        //lobby.removeValue();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
+        // if the app is in background stop the music
+        if(isGoingToBackground){
+            stopService(new Intent(CreateGameActivity.this, BackgroundSoundService.class));
+        }
+
         if(!isChangingActivity){
-            DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
+            lobby = new GameDB().getDbRef().child(gameCode);
             // delete the game
             lobby.removeValue();
-            finish();
         }
+
+        finish();
     }
 }

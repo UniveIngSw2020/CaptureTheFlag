@@ -2,6 +2,7 @@ package com.junipero.capturetheflag;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 
@@ -34,6 +35,8 @@ import java.util.Objects;
 public class GameActivity extends AppCompatActivity {
     public SensorManager cSesnor;
     String gameCode, role, team, numOfPlayers;
+    private boolean isGoingBack = false;
+    private DatabaseReference lobby;
 
     @SuppressLint("UseCompatLoadingForDrawables")
     @Override
@@ -53,7 +56,13 @@ public class GameActivity extends AppCompatActivity {
         team = i.getStringExtra("team");
         //TextView myLocation = findViewById(R.id....);
 
-        final DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
+
+        SharedPreferences sp = getSharedPreferences("SoundSettings", MODE_PRIVATE);
+        if (sp.getBoolean("isActive", true)){
+            startService(new Intent(GameActivity.this, BackgroundSoundService.class));
+        }
+
+        lobby = new GameDB().getDbRef().child(gameCode);
         /*
         final DatabaseReference myTeamFlagRef = lobby.child(team).child("Keeper");
         final DatabaseReference otherTeamFlagRef = lobby.child((team.equals("Blue") ? "Red" : "Blue" ))
@@ -122,9 +131,21 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
-        // if you levae the game your score will be losts +1
+        isGoingBack = true;
+        // if you leave the game your score will be losts +1
         endGame((team.equals("Red")) ? "Blue" : "Red" + " wins");
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        StoredDataManager sdm = new StoredDataManager(GameActivity.this.getFilesDir());
+        lobby.child(team).child(role).child(sdm.getUser().getId()).removeValue();
+        // if the app is in background stop the music
+        if(!isGoingBack){
+            stopService(new Intent(GameActivity.this, BackgroundSoundService.class));
+        }
+        finish();
     }
 }

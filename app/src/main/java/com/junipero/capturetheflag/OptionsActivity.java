@@ -6,6 +6,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import android.annotation.SuppressLint;
 import android.app.VoiceInteractor;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -22,6 +23,7 @@ import com.google.android.material.snackbar.Snackbar;
 import static android.icu.text.DisplayContext.LENGTH_SHORT;
 
 public class OptionsActivity extends AppCompatActivity {
+    private boolean isGoingBack = false;
 
     View profile, help, settings;
     // views of profile fragment
@@ -119,17 +121,20 @@ public class OptionsActivity extends AppCompatActivity {
             }
         });
 
+        SharedPreferences sp = getSharedPreferences("SoundSettings", MODE_PRIVATE);
+        final SharedPreferences.Editor spEditor = sp.edit();
+        soundToggle.setChecked(sp.getBoolean("isActive", true));
         soundToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
                     // activate sound
-                    Toast.makeText(OptionsActivity.this, "SOUND ON", Toast.LENGTH_SHORT)
-                            .show();
+                    startService(new Intent(OptionsActivity.this, BackgroundSoundService.class));
+                    spEditor.putBoolean("isActive", true).apply();
                 }else{
                     // deactivate sound
-                    Toast.makeText(OptionsActivity.this, "SOUND OFF", Toast.LENGTH_SHORT)
-                            .show();
+                    stopService(new Intent(OptionsActivity.this, BackgroundSoundService.class));
+                    spEditor.putBoolean("isActive", false).apply();
                 }
             }
         });
@@ -139,10 +144,30 @@ public class OptionsActivity extends AppCompatActivity {
     }
 
     // --------------------------------------------------------------------------------------------
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        // restart music on resuming the app after going to background
+        SharedPreferences sp = getSharedPreferences("SoundSettings", MODE_PRIVATE);
+        if (sp.getBoolean("isActive", true)){
+            startService(new Intent(OptionsActivity.this, BackgroundSoundService.class));
+        }
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
+        isGoingBack = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // if the app is in background stop the music
+        if(!isGoingBack){
+            stopService(new Intent(OptionsActivity.this, BackgroundSoundService.class));
+        }
     }
 }
 

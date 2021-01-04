@@ -18,7 +18,7 @@ public class BackgroundSoundService extends Service {
         super.onCreate();
         player = MediaPlayer.create(this, R.raw.awesomeness);
         player.setLooping(true); // Set looping
-        player.setVolume(100,100);
+        player.setVolume(30,30);
 
     }
 
@@ -48,8 +48,9 @@ public class BackgroundSoundService extends Service {
     }
     @Override
     public void onDestroy() {
-        player.stop();
-        player.release();
+        player.pause();
+        //player.stop();
+        //player.release();
     }
 
     @Override

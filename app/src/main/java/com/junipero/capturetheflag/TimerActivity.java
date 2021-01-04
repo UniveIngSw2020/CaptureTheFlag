@@ -26,6 +26,7 @@ public class TimerActivity extends AppCompatActivity {
     String gameCode;
     boolean isChangingActivity = false;
     boolean isGoingBackground = false;
+    private boolean isGoingBack = false;
     int numOfPlayers;
 
     @Override
@@ -150,6 +151,7 @@ public class TimerActivity extends AppCompatActivity {
     // delete all data of current game stored in db
     @Override
     public void onBackPressed() {
+        isGoingBack = true;
         DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
         StoredDataManager sdm = new StoredDataManager(TimerActivity.this.getFilesDir());
         // then remove data
@@ -160,6 +162,10 @@ public class TimerActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        // if the app is in background stop the music
+        if(!isGoingBack){
+            stopService(new Intent(TimerActivity.this, BackgroundSoundService.class));
+        }
 
         if(!isChangingActivity){
             isGoingBackground = true;
@@ -174,8 +180,8 @@ public class TimerActivity extends AppCompatActivity {
             lobby.child(data[2]).child(data[1]).child(sdm.readID()).removeValue();
             numOfPlayers = numOfPlayers -1;
             lobby.child("Number of players").setValue(numOfPlayers);
-            finish();
         }
 
+        finish();
     }
 }

@@ -32,7 +32,7 @@
             android:layout_height="30dp"
             android:backgroundTint="#FAFAFA"
             android:text="@string/sound_on_off"
-            android:checked="true"
+            android:defaultFocusHighlightEnabled="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

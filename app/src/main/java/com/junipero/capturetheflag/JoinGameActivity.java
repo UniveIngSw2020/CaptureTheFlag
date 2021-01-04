@@ -33,6 +33,7 @@ public class JoinGameActivity extends AppCompatActivity {
     String gameCode = "";
     private boolean isChangingActivity = false;
     private boolean isGoingBackground = false;
+    private boolean isGoingBack = false;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -167,6 +168,7 @@ public class JoinGameActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        isGoingBack = true;
         if(!gameCode.equals("")){
             StoredDataManager sdm = new StoredDataManager(JoinGameActivity.this.getFilesDir());
             db.child(gameCode).child("Players").child(sdm.readID()).removeValue();
@@ -176,12 +178,18 @@ public class JoinGameActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+
+        // if the app is in background stop the music
+        if(!isGoingBack){
+            stopService(new Intent(JoinGameActivity.this, BackgroundSoundService.class));
+        }
+
         if(!gameCode.equals("") && !isChangingActivity){
             isGoingBackground = true;
             StoredDataManager sdm = new StoredDataManager(JoinGameActivity.this.getFilesDir());
             // remove myself from the lobby
             db.child(gameCode).child("Players").child(sdm.readID()).removeValue();
-            finish();
         }
+        finish();
     }
 }
