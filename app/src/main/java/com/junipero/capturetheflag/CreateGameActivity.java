@@ -97,7 +97,7 @@ public class CreateGameActivity extends AppCompatActivity {
         // set the current state of the game
         lobby.child("State").setValue("Waiting for start");
         // adding myself to the lobby
-        DatabaseReference players = lobby.child("Players");
+        final DatabaseReference players = lobby.child("Players");
         players.child(me.readID()).setValue(me.readName());
 
         /* additional debug players added to start testing of room */
@@ -120,8 +120,9 @@ public class CreateGameActivity extends AppCompatActivity {
                     startbutton.setEnabled(false);
                     startbutton.setAlpha(0.8f);
                 }else{
+                    players_list.clear();
                     // get all players as <String, String> (key: ID, value: Name) then adding to an ArrayList
-                    for(DataSnapshot child: snapshot.getChildren()){
+                    for(DataSnapshot child : snapshot.getChildren()){
                         players_list.add(new Pair<String, String>(child.getKey(),
                                 child.getValue().toString()));
                     }
@@ -145,6 +146,7 @@ public class CreateGameActivity extends AppCompatActivity {
                 ArrayList<Quadruple<String, String, String, String>> final_players_list =
                         new ArrayList<>(players_list.size());
                 Collections.shuffle(players_list);
+
 
                 // shunt algorithm
                 for(int i = 0; i < players_list.size(); i++){
@@ -175,8 +177,8 @@ public class CreateGameActivity extends AppCompatActivity {
                             .child(player.third.toString())
                             .child(player.first.toString())
                             .setValue(player.second.toString());
-                }
 
+                }
                 // set State of current game in "Timer" after shunting
                 lobby.child("State").setValue("Timer");
 

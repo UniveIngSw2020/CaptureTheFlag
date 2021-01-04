@@ -32,6 +32,7 @@ public class JoinGameActivity extends AppCompatActivity {
     DatabaseReference db;
     String gameCode = "";
     private boolean isChangingActivity = false;
+    private boolean isGoingBackground = false;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -104,13 +105,16 @@ public class JoinGameActivity extends AppCompatActivity {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                                 // here's the checker, then start the Timer activity
-                                                if (snapshot.getValue().toString().equals("Timer")){
+                                                if (snapshot.getValue() != null &&
+                                                        snapshot.getValue().toString().equals("Timer")){
                                                     // when State is set to TIMER, switch to TimerActivity
                                                     Intent i = new Intent(JoinGameActivity.this,
                                                             TimerActivity.class);
                                                     i.putExtra("gameCode", edit_game.getText().toString());
                                                     isChangingActivity = true;
-                                                    startActivity(i);
+                                                    if(!isGoingBackground){
+                                                        startActivity(i);
+                                                    }
                                                     finish();
                                                 }
                                             }
@@ -173,6 +177,7 @@ public class JoinGameActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         if(!gameCode.equals("") && !isChangingActivity){
+            isGoingBackground = true;
             StoredDataManager sdm = new StoredDataManager(JoinGameActivity.this.getFilesDir());
             // remove myself from the lobby
             db.child(gameCode).child("Players").child(sdm.readID()).removeValue();
