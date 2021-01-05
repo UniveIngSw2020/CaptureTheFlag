@@ -1,5 +1,6 @@
 # CaptureTheFlag
-![CaptureTheFlag Logo](app/src/main/res/drawable/ctf.png)
+![CaptureTheFlag Logo](app/src/main/res/drawable-xxhdpi/ctf.png)
+
 IS 2020 project by Junipero team
 
 > The game "capture the flag" is formed of two enemy teams that compete. Each team will have a fort,
