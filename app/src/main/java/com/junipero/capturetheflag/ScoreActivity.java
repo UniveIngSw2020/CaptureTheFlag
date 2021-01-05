@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,6 +31,7 @@ public class ScoreActivity extends AppCompatActivity {
         // stop the music to reproduce sound fx of this activity
         stopService(new Intent(ScoreActivity.this, BackgroundSoundService.class));
 
+        // get my data passed from previous activity
         Intent i = this.getIntent();
         String team = i.getStringExtra("team");
         final String role = i.getStringExtra("role");
@@ -38,9 +40,10 @@ public class ScoreActivity extends AppCompatActivity {
         // score contains the message: "Red/Blue wins" or "Tie" or "Cancelled"
         final String gameCode = i.getStringExtra("gameCode");
 
-
+        // StoredDataManager used to update user's local stats
         StoredDataManager sdm = new StoredDataManager(ScoreActivity.this.getFilesDir());
         TextView scoreText = findViewById(R.id.score);
+        // manage different scenarios of ending the game, then updating the personal score
         if(score.equals("Cancelled")){
             scoreSound = MediaPlayer.create(ScoreActivity.this,R.raw.uauauaaaa);
             scoreText.setText("The game\nhas been cancelled");
@@ -58,30 +61,16 @@ public class ScoreActivity extends AppCompatActivity {
             sdm.increaseLosts();
             scoreText.setText("You lost");
         }
+
+        // manage sound if enabled/disabled from user'settings
         scoreSound.setVolume(50,50);
+        SharedPreferences sp = getSharedPreferences("SoundSettings", MODE_PRIVATE);
+        if (!sp.getBoolean("isActive", true)){
+            scoreSound.setVolume(0,0);
+        }
         scoreSound.start();
 
-
-        /*
-        db.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.hasChild(gameCode)){
-                    for (DataSnapshot game : snapshot.getChildren()){
-                        if (game.getKey().equals(gameCode))
-                            game.getRef().removeValue();
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-         */
-
+        // the game finished, so the activities will be destroyed
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {

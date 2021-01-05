@@ -11,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,55 +20,32 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.appcompat.widget.Toolbar;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.OnLifecycleEvent;
-
-import com.google.firebase.database.DatabaseReference;
 
 public class MainActivity extends AppCompatActivity{
 
-    private static final int STORAGE_PERMISSION_CODE = 101;
-    private MediaPlayer player;
-    private Intent svc;
     private LocationManager lm;
+    // declaring some views of MainActivity
     private TextView welcome_msg;
     private Button button_create, button_join;
-    private boolean isGoingToBackground = true;
+    // flag needed to control if the app is going to background
+    private boolean isGoingBack = true;
 
+    // auto-generated class needed for checking permission
     private class MyLocationListener implements LocationListener {
         @Override
-        public void onLocationChanged(Location location) {
-            // TODO Auto-generated method stub
-        }
+        public void onLocationChanged(Location location) { }
 
         @Override
-        public void onProviderDisabled(String provider) {
-            // TODO Auto-generated method stub
-        }
+        public void onProviderDisabled(String provider) { }
 
         @Override
-        public void onProviderEnabled(String provider) {
-            // TODO Auto-generated method stub
-        }
+        public void onProviderEnabled(String provider) { }
 
         @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            // TODO Auto-generated method stub
-        }
+        public void onStatusChanged(String provider, int status, Bundle extras) { }
     }
-
-
-    GameDB db = null;
-    private final String TAG = "MainActivity";
-    private final String Myname = "Nasi";
-   // private final String path = MainActivity.this.getFilesDir() + "/userdata/data";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -78,25 +54,6 @@ public class MainActivity extends AppCompatActivity{
 
         welcome_msg = findViewById(R.id.welcome);
 
-        lm = (LocationManager) getSystemService(Activity.LOCATION_SERVICE);
-
-        /*
-        player = MediaPlayer.create(MainActivity.this,R.raw.awesomeness);
-        player.setLooping(true);
-        player.setVolume(50,50);
-        if(!player.isPlaying()){
-                player.start();
-            }
-        }
-
-         */
-
-
-        /*
-        svc = new Intent(this, BackgroundSoundService.class);
-        startService(svc);
-
-         */
 
 
         //------------------FILE MANAGER-------------------------------
@@ -108,30 +65,25 @@ public class MainActivity extends AppCompatActivity{
                     CreateUserActivity.class));
         }
 
-        // -------------------BUTTONS-------------------------------
+        // ------------------- BUTTONS SECTION -------------------------------
 
         button_create = findViewById(R.id.button_create);
-        /*
-        StoredDataManager sdm = new StoredDataManager(MainActivity.this.getFilesDir());
-        if(! sdm.getUser().getName().equals("nasik")){
-            button_create.setVisibility(View.INVISIBLE);
-        }
-        */
-
+        // clicking this button you'll be redirected to CreateGameActivity
         button_create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isGoingToBackground = false;
+                isGoingBack = false; // when starting a new activity you're not going to background
                 startActivity(new Intent(MainActivity.this,
                         CreateGameActivity.class));
             }
         });
 
         button_join = findViewById(R.id.button_join);
+        // clicking this button you'll be redirected to JoinGameActivity
         button_join.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isGoingToBackground = false;
+                isGoingBack = false; // when starting a new activity you're not going to background
                 startActivity(new Intent(MainActivity.this,
                         JoinGameActivity.class));
             }
@@ -140,9 +92,11 @@ public class MainActivity extends AppCompatActivity{
 
         // ---------------LOCATION UPDATER-----------------
 
-
+        // authorize Location services
         checkLocationPermission();
 
+        // declaring location manager to manage GPS and INTERNET signals
+        lm = (LocationManager) getSystemService(Activity.LOCATION_SERVICE);
         if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1,
                     new MyLocationListener());
@@ -151,21 +105,16 @@ public class MainActivity extends AppCompatActivity{
                     new MyLocationListener());
         }
 
-        // needed to manage location data (only wrapped things)
-        //LocationUpdater locationUpdater = new LocationUpdater(this);
-        // set the old location saved by the gps in the textView
-        //myLocation.setText(locationUpdater.getActualPosition());
-
-
         // --------------------------------- GPS enabled? -----------------------------------------
 
+        // managing the app if the GPS is not enabled
         if ( !lm.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
             welcome_msg.setText("Your GPS is turned off.\n\nTurn it on now!");
-            // disable buttons
+            // hide buttons
             button_create.setVisibility(View.INVISIBLE);
             button_join.setVisibility(View.INVISIBLE);
 
-            // show location settings page after 2 seconds
+            // redirect to device's location settings page after 2 seconds
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -173,16 +122,7 @@ public class MainActivity extends AppCompatActivity{
                     startActivity(intent);
                 }
             }, 2000);
-
         }
-
-
-        // ----------------- DATABASE MANAGER ---------------------------
-
-        db = new GameDB();
-       // db.getDbRef().child("/" + Myname);
-        db.getDbRef().child("/test").setValue("Sono IN lalalal ");
-
     }
 
     // ------------------------------ END ON CREATE ---------------------------------------------
@@ -194,13 +134,10 @@ public class MainActivity extends AppCompatActivity{
         return true;
     }
 
-
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // Handle action bar item clicks here.
         int id = item.getItemId();
 
         // kebab menu options
@@ -225,7 +162,7 @@ public class MainActivity extends AppCompatActivity{
     private void moveToOption (int id){
         Intent i = new Intent(MainActivity.this, OptionsActivity.class);
         i.putExtra("option", id);
-        isGoingToBackground = false; // used to not stop the music
+        isGoingBack = false; // used to not stop the music
         startActivity(i);
     }
 
@@ -238,28 +175,26 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-
     @Override
     protected void onRestart() {
         super.onRestart();
         // needed for permission checkers
         recreate();
-
+        // get the preferences about Sound settings saved in the local storage as a SharePrefs
         SharedPreferences sp = getSharedPreferences("SoundSettings", MODE_PRIVATE);
+        // start the music if the value is set to TRUE
         if (sp.getBoolean("isActive", true)){
             startService(new Intent(MainActivity.this, BackgroundSoundService.class));
         }
     }
 
-
     @Override
     protected void onPause() {
         super.onPause();
         // if the app is in background stop the music
-        if(isGoingToBackground){
+        if(isGoingBack){
            stopService(new Intent(MainActivity.this, BackgroundSoundService.class));
         }
-        //stopService(svc);
     }
 
 

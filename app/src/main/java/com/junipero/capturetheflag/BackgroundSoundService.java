@@ -1,16 +1,17 @@
 package com.junipero.capturetheflag;
 
-import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.IBinder;
+/*
+ * this service is used to manage the main soundtrack of the application
+ * the name of this song is Awesomeness from https://opengameart.org/
+ */
 
 public class BackgroundSoundService extends Service {
-    private static final String TAG = null;
-    MediaPlayer player;
+    private MediaPlayer player;
     public IBinder onBind(Intent arg0) {
-
         return null;
     }
     @Override
@@ -19,7 +20,6 @@ public class BackgroundSoundService extends Service {
         player = MediaPlayer.create(this, R.raw.awesomeness);
         player.setLooping(true); // Set looping
         player.setVolume(30,30);
-
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -27,34 +27,15 @@ public class BackgroundSoundService extends Service {
         return START_STICKY;
     }
 
-
-
-    public void onStart(Intent intent, int startId) {
-        // TO DO
-    }
-    public IBinder onUnBind(Intent arg0) {
-        // TO DO Auto-generated method
-        return null;
-    }
-
-    public void onStop() {
-        player.stop();
-        player.release();
-    }
-
-    public void onPause() {
-        player.stop();
-        player.release();
-    }
     @Override
     public void onDestroy() {
-        player.pause();
-        //player.stop();
-        //player.release();
+        player.stop();
+        player.release();
     }
 
     @Override
     public void onLowMemory() {
-
+        player.stop();
+        player.release();
     }
 }

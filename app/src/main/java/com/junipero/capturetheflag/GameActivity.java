@@ -3,39 +3,28 @@ package com.junipero.capturetheflag;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.hardware.SensorManager;
 import android.os.Bundle;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
-
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.junipero.capturetheflag.ui.main.SectionsPagerAdapter;
-
-import org.w3c.dom.Text;
-
 import java.util.Objects;
 
 public class GameActivity extends AppCompatActivity {
-    public SensorManager cSesnor;
-    String gameCode, role, team, numOfPlayers;
+
+    // declaring some strings used to manage my data
+    private String gameCode, role, team, numOfPlayers;
+    // flag to manage music on going to background
     private boolean isGoingBack = false;
+    private boolean isChangingActivity = false;
+    private boolean isGoingBackground = false;
+    // reference to the lobby where I'm in
     private DatabaseReference lobby;
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -48,46 +37,51 @@ public class GameActivity extends AppCompatActivity {
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
+        CoordinatorLayout layout = findViewById(R.id.gameActivityLayout);
 
-
+        // get data from previous activity
         Intent i = getIntent();
         gameCode = i.getStringExtra("gameCode");
         role = i.getStringExtra("role");
         team = i.getStringExtra("team");
-        //TextView myLocation = findViewById(R.id....);
 
-
+        // re-enable background music if the user set it to "Enabled"
         SharedPreferences sp = getSharedPreferences("SoundSettings", MODE_PRIVATE);
         if (sp.getBoolean("isActive", true)){
             startService(new Intent(GameActivity.this, BackgroundSoundService.class));
         }
 
+        // initialize the reference to the actual lobby where I'm in
         lobby = new GameDB().getDbRef().child(gameCode);
-        /*
-        final DatabaseReference myTeamFlagRef = lobby.child(team).child("Keeper");
-        final DatabaseReference otherTeamFlagRef = lobby.child((team.equals("Blue") ? "Red" : "Blue" ))
-                .child("Keeper");
 
-         */
-
-        //final LocationUpdater myPosition = new LocationUpdater(this, myLocation);
         lobby.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 // state of game controller
                 // isGoingBack used to end the game just for a single instance
-                if (snapshot.child("State").getValue() != null && !isGoingBack) {
-                    if (Objects.requireNonNull(snapshot.child("State").getValue()).toString().equals("End")) {
-                        endGame(Objects.requireNonNull(snapshot.child("Score").getValue()).toString());
+                if (snapshot.child("State").getValue() != null && !isGoingBack && !isGoingBackground) {
+                    // end the actual game if it's ended
+                    if (Objects.requireNonNull(snapshot.child("State")
+                            .getValue()).toString().equals("End")) {
+
+                        isChangingActivity = true;
+                        endGame(Objects.requireNonNull(snapshot.child("Score")
+                                .getValue()).toString());
                     }
 
                     // check if the game has been cancelled
-                    else if (Objects.requireNonNull(snapshot.child("State").getValue()).toString().equals("Cancelled")) {
+                    else if (Objects.requireNonNull(snapshot.child("State")
+                            .getValue()).toString().equals("Cancelled")) {
+
+                        isChangingActivity = true;
                         endGame("Cancelled");
                     }
 
-                    // Cancel the game if the numbers of player is too low
-                    else if (Integer.parseInt(Objects.requireNonNull(snapshot.child("Number of players").getValue()).toString()) < 4) {
+                    // cancel the game if the numbers of player is too low
+                    else if (Integer.parseInt(Objects.requireNonNull(snapshot.child("Number of players")
+                            .getValue()).toString()) < 4) {
+
+                        isChangingActivity = true;
                         lobby.child("State").setValue("Cancelled");
                         endGame("Cancelled");
                     }
@@ -97,27 +91,21 @@ public class GameActivity extends AppCompatActivity {
                 if (snapshot.child("Number of players").getValue() != null) {
                     numOfPlayers = snapshot.child("Number of players").getValue().toString();
                 }
-
-
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError error) { }
         });
 
-        CoordinatorLayout layout = findViewById(R.id.gameActivityLayout);
         // change background color in GameActivity
         if(team.equals("Red")){
             layout.setBackground(getDrawable(R.drawable.red_bg));
         }else if(team.equals("Blue")){
             layout.setBackground(getDrawable(R.drawable.blue_bg));
         }
-
-
     }
 
+    // this will switch to another activity to manage the END of the game in different scenarios
     private void endGame(String score){
         Intent i = new Intent(GameActivity.this, ScoreActivity.class);
         i.putExtra("score", score);
@@ -133,20 +121,26 @@ public class GameActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         isGoingBack = true;
-        // if you leave the game your score will be losts +1
-        endGame((team.equals("Red")) ? "Blue" : "Red" + " wins");
-
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+
+        // remove myself from the game if i'm leaving this activity
         StoredDataManager sdm = new StoredDataManager(GameActivity.this.getFilesDir());
         lobby.child(team).child(role).child(sdm.getUser().getId()).removeValue();
         // if the app is in background stop the music
-        if(!isGoingBack){
+        if(!isGoingBack) {
             stopService(new Intent(GameActivity.this, BackgroundSoundService.class));
         }
+
+        // if you leave the game your score will be losts +1
+        if (!isChangingActivity){
+            isGoingBackground = true;
+            endGame((team.equals("Red")) ? "Blue" : "Red" + " wins");
+        }
+        // then finish this activity
         finish();
     }
 }

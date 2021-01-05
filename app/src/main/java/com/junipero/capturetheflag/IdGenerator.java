@@ -3,8 +3,8 @@ package com.junipero.capturetheflag;
 import java.util.Calendar;
 import java.util.Random;
 
+// library of random ID generator functions
 public final class IdGenerator {
-    // made by Mario
 
     public static String generatePlayerId() {
         StringBuilder millis = new StringBuilder();

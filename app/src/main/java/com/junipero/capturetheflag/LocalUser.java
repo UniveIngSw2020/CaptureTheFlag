@@ -2,14 +2,13 @@ package com.junipero.capturetheflag;
 
 import android.annotation.SuppressLint;
 
-import java.io.Serializable;
-
 public class LocalUser {
 
     private String id;
     private String name;
     private int wins, losts, ties;
 
+    // default constructor
     public LocalUser(){
         this.id = "0";
         this.name = "None";
@@ -18,8 +17,7 @@ public class LocalUser {
         this.ties = 0;
     }
 
-    // ---------------- GETTER -------------------------
-
+    // ---------------- SETTER -------------------------
     public void setId(String id) { this.id = id; }
 
     public void setName(String name) { this.name = name; }
@@ -36,7 +34,7 @@ public class LocalUser {
         this.ties = ties;
     }
 
-    // -------- SETTER ------------------
+    // -------- GETTER ------------------
     public String getId() { return id; }
 
     public String getName() { return name; }

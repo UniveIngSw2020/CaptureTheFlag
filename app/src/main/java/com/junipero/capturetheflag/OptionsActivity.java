@@ -25,14 +25,14 @@ import static android.icu.text.DisplayContext.LENGTH_SHORT;
 public class OptionsActivity extends AppCompatActivity {
     private boolean isGoingBack = false;
 
-    View profile, help, settings;
+    private View profile, help, settings;
     // views of profile fragment
-    TextView idView, nameView, winsView, lostsView, tiesView;
+    private TextView idView, nameView, winsView, lostsView, tiesView;
 
     //views of settings fragment
-    SwitchCompat soundToggle;
-    EditText changeNicknameEdit;
-    Button changeNicknameButton;
+    private SwitchCompat soundToggle;
+    private EditText changeNicknameEdit;
+    private Button changeNicknameButton;
 
 
     @Override
@@ -44,7 +44,7 @@ public class OptionsActivity extends AppCompatActivity {
         help = findViewById(R.id.fragment_help);
         settings = findViewById(R.id.fragment_settings);
 
-        Intent i =  getIntent();
+        Intent i =  getIntent();    // get intent form previous activity
         int id = i.getIntExtra("option", 0);
 
         switch (id) {
@@ -68,6 +68,7 @@ public class OptionsActivity extends AppCompatActivity {
     // profile fragment views manager
     @SuppressLint("SetTextI18n")
     private void switch_to_profile(){
+        // set which views are not enabled
         profile.setVisibility(View.VISIBLE);
         help.setVisibility(View.INVISIBLE);
         settings.setVisibility(View.INVISIBLE);
@@ -77,8 +78,9 @@ public class OptionsActivity extends AppCompatActivity {
         lostsView = findViewById(R.id.lostsView);
         tiesView = findViewById(R.id.tiesView);
 
+        // obtain my data from the local JSON file
         StoredDataManager sdm = new StoredDataManager(OptionsActivity.this.getFilesDir());
-
+        // then show them
         idView.setText("ID: " + sdm.getUser().getId());
         nameView.setText("Name: " + sdm.getUser().getName());
         winsView.setText("Wins: \n" + sdm.getUser().getWins());
@@ -88,6 +90,7 @@ public class OptionsActivity extends AppCompatActivity {
     }
 
     private void switch_to_help(){
+        // set which views are not enabled
         profile.setVisibility(View.INVISIBLE);
         help.setVisibility(View.VISIBLE);
         settings.setVisibility(View.INVISIBLE);
@@ -95,15 +98,18 @@ public class OptionsActivity extends AppCompatActivity {
 
     // settings fragment views manager
     private void switch_to_settings(){
+        // set which views are not enabled
         profile.setVisibility(View.INVISIBLE);
         help.setVisibility(View.INVISIBLE);
         settings.setVisibility(View.VISIBLE);
-        final StoredDataManager sdm = new StoredDataManager(OptionsActivity.this.getFilesDir());
 
+        // initialize some views about this fragment
         soundToggle = findViewById(R.id.soundSwitch);
         changeNicknameEdit = findViewById(R.id.changeNicknameEditText);
         changeNicknameButton = findViewById(R.id.changeNicknameButton);
 
+        // get my data from local JSON file
+        final StoredDataManager sdm = new StoredDataManager(OptionsActivity.this.getFilesDir());
 
         // listener for button to change your nickname in local JSON file
         changeNicknameButton.setOnClickListener(new View.OnClickListener() {
@@ -121,6 +127,7 @@ public class OptionsActivity extends AppCompatActivity {
             }
         });
 
+        // get the user's preferences about the background music
         SharedPreferences sp = getSharedPreferences("SoundSettings", MODE_PRIVATE);
         final SharedPreferences.Editor spEditor = sp.edit();
         soundToggle.setChecked(sp.getBoolean("isActive", true));

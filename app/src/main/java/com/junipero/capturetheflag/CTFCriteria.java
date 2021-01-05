@@ -2,6 +2,8 @@ package com.junipero.capturetheflag;
 
 import android.location.Criteria;
 
+// this class contains parameters to manage the LocationManager Class
+// edit this parameters if needed
 public class CTFCriteria extends Criteria{
     // set ACCURACY_FINE or ACCURACY_COARSE
     private static final int ACCURACY = Criteria.ACCURACY_FINE;
@@ -12,7 +14,7 @@ public class CTFCriteria extends Criteria{
     // set the Power management of this criteria
     private static final int POWER_REQUIREMENT = Criteria.POWER_LOW;
 
-
+    // it's just a setter
     public CTFCriteria() {
         super();
         this.setAccuracy(ACCURACY);

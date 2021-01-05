@@ -1,36 +1,30 @@
 package com.junipero.capturetheflag;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Paint;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Iterator;
 
 public class JoinGameActivity extends AppCompatActivity {
 
-    DatabaseReference db;
-    String gameCode = "";
+    private DatabaseReference db;
+    private String gameCode = "";
+    // flags for management the game and the background music
     private boolean isChangingActivity = false;
     private boolean isGoingBackground = false;
     private boolean isGoingBack = false;
@@ -41,9 +35,11 @@ public class JoinGameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join_game);
 
+        // set the title of this activity
         TextView joinTitle = findViewById(R.id.joingametv);
         joinTitle.setText("JOIN A LOBBY");
 
+        // declaring and initializing some views
         final EditText edit_game = findViewById(R.id.inputidgame);
         final TextView wait_start = findViewById(R.id.waitstart);
         final Button joinButton = findViewById(R.id.joinbutton);
@@ -63,6 +59,7 @@ public class JoinGameActivity extends AppCompatActivity {
             }, 2000);
         }
 
+        // obtain database reference and my data from local JSON file
         db = new GameDB().getDbRef();
         final StoredDataManager me = new StoredDataManager(JoinGameActivity.this.getFilesDir());
 
@@ -79,7 +76,7 @@ public class JoinGameActivity extends AppCompatActivity {
                                 .getValue() != null && snapshot.child(gameCode).child("State")
                                 .getValue().toString().equals("Waiting for start")){
 
-                            // the lobby room exists
+                            // the lobby room exists so add myself to the selected lobby
                             db.child(edit_game.getText().toString()).child("Players")
                                     .addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
@@ -90,13 +87,6 @@ public class JoinGameActivity extends AppCompatActivity {
                                         db.child(edit_game.getText().toString()).child("Players")
                                                 .child(me.readID()).setValue(me.readName());
 
-                                        //players.child(me.readID()).setValue(me.readName());
-                                        //write code to perform in db
-                                        /*  DEBUG: show players in room
-                                        Toast.makeText(JoinGameActivity.this,
-                                                Long.valueOf(snapshot.getChildrenCount()).toString() ,
-                                                Toast.LENGTH_SHORT).show();
-                                         */
                                         joinButton.setAlpha(0.6f);
                                         wait_start.setText("Waiting the game to start...");
 
@@ -121,9 +111,7 @@ public class JoinGameActivity extends AppCompatActivity {
                                             }
 
                                             @Override
-                                            public void onCancelled(@NonNull DatabaseError error) {
-
-                                            }
+                                            public void onCancelled(@NonNull DatabaseError error) { }
                                         });
                                     }else{
                                         Toast.makeText(JoinGameActivity.this,
@@ -133,9 +121,7 @@ public class JoinGameActivity extends AppCompatActivity {
                                 }
 
                                 @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                }
+                                public void onCancelled(@NonNull DatabaseError error) { }
                             });
 
 
@@ -149,9 +135,7 @@ public class JoinGameActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
+                    public void onCancelled(@NonNull DatabaseError error) { }
                 });
             }
         });
@@ -169,7 +153,8 @@ public class JoinGameActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         isGoingBack = true;
-        if(!gameCode.equals("")){
+        // remove myself from the game I was in if i'm going back
+        if(!gameCode.equals("") && !isChangingActivity){
             StoredDataManager sdm = new StoredDataManager(JoinGameActivity.this.getFilesDir());
             db.child(gameCode).child("Players").child(sdm.readID()).removeValue();
         }
@@ -183,6 +168,7 @@ public class JoinGameActivity extends AppCompatActivity {
         if(!isGoingBack){
             stopService(new Intent(JoinGameActivity.this, BackgroundSoundService.class));
         }
+
 
         if(!gameCode.equals("") && !isChangingActivity){
             isGoingBackground = true;

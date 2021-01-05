@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+// this Fragment will show to users the guide of the game
 class HelpFragment extends Fragment {
 
     @Nullable

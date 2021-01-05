@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
+// basic fragment to show the layout of your score
 public class ProfileFragment extends Fragment {
 
 
