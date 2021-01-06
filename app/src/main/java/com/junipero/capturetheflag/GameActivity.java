@@ -24,6 +24,7 @@ public class GameActivity extends AppCompatActivity {
     private boolean isGoingBack = false;
     private boolean isChangingActivity = false;
     private boolean isGoingBackground = false;
+    private boolean isFinishingGame = false;
     // reference to the lobby where I'm in
     private DatabaseReference lobby;
 
@@ -59,11 +60,12 @@ public class GameActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 // state of game controller
                 // isGoingBack used to end the game just for a single instance
-                if (snapshot.child("State").getValue() != null && !isGoingBack && !isGoingBackground) {
+                if (snapshot.child("State").getValue() != null && !isGoingBack
+                        && !isGoingBackground && !isFinishingGame) {
                     // end the actual game if it's ended
                     if (Objects.requireNonNull(snapshot.child("State")
                             .getValue()).toString().equals("End")) {
-
+                        isFinishingGame = true;
                         isChangingActivity = true;
                         endGame(Objects.requireNonNull(snapshot.child("Score")
                                 .getValue()).toString());
@@ -72,7 +74,7 @@ public class GameActivity extends AppCompatActivity {
                     // check if the game has been cancelled
                     else if (Objects.requireNonNull(snapshot.child("State")
                             .getValue()).toString().equals("Cancelled")) {
-
+                        isFinishingGame = true;
                         isChangingActivity = true;
                         endGame("Cancelled");
                     }
@@ -80,7 +82,7 @@ public class GameActivity extends AppCompatActivity {
                     // cancel the game if the numbers of player is too low
                     else if (Integer.parseInt(Objects.requireNonNull(snapshot.child("Number of players")
                             .getValue()).toString()) < 4) {
-
+                        isFinishingGame = true;
                         isChangingActivity = true;
                         lobby.child("State").setValue("Cancelled");
                         endGame("Cancelled");

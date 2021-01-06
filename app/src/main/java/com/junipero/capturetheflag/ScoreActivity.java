@@ -76,7 +76,7 @@ public class ScoreActivity extends AppCompatActivity {
             public void run() {
                 // delete record of the game played from db if still exists
                 assert gameCode != null;
-                if(numOfPlayers < 4 || role.equals("Keeper")){
+                if(numOfPlayers < 4 || role.equals("Keeper") || score.equals("Cancelled")){
                     DatabaseReference lobby = new GameDB().getDbRef().child(gameCode);
                     lobby.removeValue();
                 }

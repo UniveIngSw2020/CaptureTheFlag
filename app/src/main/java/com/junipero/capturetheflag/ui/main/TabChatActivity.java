@@ -11,27 +11,25 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.junipero.capturetheflag.GameDB;
 import com.junipero.capturetheflag.R;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class TabChatActivity extends Fragment {
 
-    Intent i;
-    String gameCode, role, team, id, name, temp_key;
-    TextView chat_msg;
-    ScrollView scrollChat;
+    // declaration of some parameters in this view
+    private Intent i;
+    private String gameCode, role, team, id, name, temp_key;
+    private TextView chat_msg;
+    private ScrollView scrollChat;
 
     @Override
     public View onCreateView(
@@ -58,8 +56,7 @@ public class TabChatActivity extends Fragment {
         id = i.getStringExtra("id");
         name = i.getStringExtra("name");
 
-        // put your code here ¯\_(ツ)_/¯
-
+        // initialize the views for this fragment
         final EditText input_msg = view.findViewById(R.id.inputMsg);
         Button send_btn = view.findViewById(R.id.sendBtn);
         chat_msg = view.findViewById(R.id.msgView);
@@ -67,6 +64,7 @@ public class TabChatActivity extends Fragment {
 
         final DatabaseReference room = new GameDB().getDbRef().child(gameCode + "/" + team + "/Chat");
 
+        // map the message and send it to the db
         send_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,12 +81,12 @@ public class TabChatActivity extends Fragment {
                     msg_root.updateChildren(map2);
                     input_msg.setText("");
                 }
-
             }
         });
 
         chat_msg.setText(Html.fromHtml("<b> Team " + team + "</b>: Welcome here!"));
 
+        // update the conversation history
         room.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
@@ -112,6 +110,7 @@ public class TabChatActivity extends Fragment {
 
     }
 
+    // this method allow users to see last messages sent in bottom of the screen
     private void append_chat_conversation (DataSnapshot snapshot){
         String name = "", msg = "";
         if(snapshot.child("Name").getValue() != null &&
@@ -126,7 +125,6 @@ public class TabChatActivity extends Fragment {
                     scrollChat.fullScroll(ScrollView.FOCUS_DOWN);
                 }
             },500);
-
         }
 
     }

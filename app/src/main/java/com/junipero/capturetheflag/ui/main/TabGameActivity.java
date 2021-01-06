@@ -19,13 +19,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,40 +35,38 @@ import java.util.Objects;
 
 public class TabGameActivity extends Fragment implements SensorEventListener {
 
-    public Activity mActivity;
+    // utilities needed to manage sensors activity
     private SensorManager mSensorManager;
-    Sensor mSensorAccelerometer;
-    Sensor mSensorMagnetometer;
+    private Sensor mSensorAccelerometer;
+    private Sensor mSensorMagnetometer;
     private float[] mAccelerometerData = new float[3];
     private float[] mMagnetometerData = new float[3];
-    TextView teamRole;
-    GameDB db;
-    double azimuthDeg;
-    Intent i;
-    String gameCode;
-    String role;
-    String team;
-    String otherTeam;
+    // declaration of views and parameters
+    private TextView teamRole;
+    private GameDB db;
+    private double azimuthDeg;
+    private Intent i;
+    private String gameCode;
+    private String role;
+    private String team;
+    private String otherTeam;
+    private TextView distanceFromOtherView;
+    private TextView distanceFromMyTeamFlagView;
+    private ImageView compassLeft, compassRight;
+    private ConstraintLayout layout;
+    private int numberOfPlayers = 10;
+    // db references
+    private DatabaseReference lobby;
+    private DatabaseReference myTeamFlagRef;
+    private DatabaseReference otherTeamFlagRef;
 
-    int numberOfPlayers = 10;
+    private double angleFromOtherFlag;
+    private double angleFromMyFlag;
 
-    DatabaseReference lobby;
-    DatabaseReference myTeamFlagRef;
-    DatabaseReference otherTeamFlagRef;
-
-    TextView distanceFromOtherView;
-    TextView distanceFromMyTeamFlagView;
-
-    ImageView compassLeft, compassRight;
-    ConstraintLayout layout;
-
-    double angleFromOtherFlag;
-    double angleFromMyFlag;
-
-    String localState = "Running";
+    private String localState = "Running";
 
     public TabGameActivity(){
-
+        // empty constructor needed for fragment
     }
 
     // just create the view, don't use it to initialize or execute your code
@@ -93,12 +88,12 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         super.onViewCreated(view, savedInstanceState);
 
         // code for GAME section
-        // get all datas from previous activity
+        // get all data from previous activity
         i = this.getActivity().getIntent();
         gameCode = i.getStringExtra("gameCode");
         role = i.getStringExtra("role");
         team = i.getStringExtra("team");
-        // initialization of other resusable vars
+        // initialization of other reusable vars
         otherTeam = (team.equals("Blue") ? "Red" : "Blue" );
         lobby = new GameDB().getDbRef().child(gameCode);
         // initialization of db references of flags in game
@@ -113,26 +108,26 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         compassRight = view.findViewById(R.id.compassRight);    // red as default
         layout = view.findViewById(R.id.gameLayout);
 
+        // initialize location manager service
         checkLocationPermission();
-
-
         CTFCriteria ctfCriteria = new CTFCriteria();
         LocationManager locationManager = (LocationManager) this.getActivity()
                 .getSystemService(Activity.LOCATION_SERVICE);
         String provider = locationManager.getBestProvider(ctfCriteria, true);
         Location location = locationManager.getLastKnownLocation(provider);
-        db = new GameDB();
-
         //activate the updates by the LocationListener
         locationManager.requestLocationUpdates(provider,
                 1000,
                 0,
                 locationListener);
 
+        db = new GameDB();
+
+        // if my role is "Stealer" I can see the flags' position
         if(role.equals("Stealer")){
             View flag_bg = view.findViewById(R.id.flagbggame);
             flag_bg.setVisibility(View.INVISIBLE);
-                /* debug locations */
+                /* default locations, will update after the game is in running */
                 otherTeamFlagRef.child("Location").child("Latitude")
                         .setValue(45.485158);
                 otherTeamFlagRef.child("Location").child("Longitude")
@@ -155,28 +150,16 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                 compassRight.setImageResource(R.drawable.arrow_blue);
                 compassLeft.setImageResource(R.drawable.arrow_red);
             }
-
-
+            // updating views for distances
             distanceFromOtherView.setText("Distance from\nother team's flag");
             distanceFromMyTeamFlagView.setText("Distance from\nmy team's flag");
         } else {
             compassLeft.setVisibility(View.INVISIBLE);
             compassRight.setVisibility(View.INVISIBLE);
-            // default position in db
-            /*
-            if (team.equals("Blue")){
-                lobby.child(team + "/Keeper/Location/Latitude").setValue("45.485158");
-                lobby.child(team + "/Keeper/Location/Longitude").setValue("12.232011");
-            } else {
-                lobby.child(team + "/Keeper/Location/Latitude").setValue("45.485426");
-                lobby.child(team + "/Keeper/Location/Longitude").setValue("12.242331");
-            }
-             */
-
         }
 
+        // show the role in your team
         teamRole.setText(Html.fromHtml("You are a <b>" + team + " " + role + "</b>"));
-
     }
 
     // ------------------------------- calculate angle -----------------------------------------
@@ -227,8 +210,9 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         @Override
         public void onLocationChanged(final Location location) {
             if(location != null) {
-
+                // Stealer options
                 if (role.equals("Stealer")) {
+                    // initialize array that wil contains position of flags
                     final double[] otherFlagPos = new double[2];
                     final double[] myFlagPos = new double[2];
 
@@ -236,7 +220,6 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             // the snapshot will now contains actual lobby table
-
                             // checking if locations != null
                             if (snapshot.child(otherTeam + "/Keeper/Location/Latitude").getValue() != null
                                     && snapshot.child(otherTeam + "/Keeper/Location/Longitude").getValue() != null
@@ -296,15 +279,12 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                                     }
                                 }
                             }
-
-
                         }
 
                         @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
+                        public void onCancelled(@NonNull DatabaseError error) { }
                     });
+                     // Keeper options to update the location in db every second
                 } else if (role.equals("Keeper") && !localState.equals("End") &&
                         !localState.equals("Cancelled")) {
                     // just update position if my role is "Keeper"
@@ -316,7 +296,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
 
                     teamRole.setText(Html.fromHtml("You are a <b>" + team + " " + role + "</b>"));
 
-
+                    // State of game listener
                     lobby.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -338,12 +318,9 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                         }
 
                         @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
+                        public void onCancelled(@NonNull DatabaseError error) { }
                     });
                 }
-
             }
         }
 
@@ -363,13 +340,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
     @Override
     public void onStart() {
         super.onStart();
-
-        // Listeners for the sensors are registered in this callback and
-        // can be unregistered in onStop().
-        //
         // Check to ensure sensors are available before registering listeners.
-        // Both listeners are registered with a "normal" amount of delay
-        // (SENSOR_DELAY_NORMAL).
         if (mSensorAccelerometer != null) {
             mSensorManager.registerListener(this, mSensorAccelerometer,
                     SensorManager.SENSOR_DELAY_NORMAL);
@@ -401,9 +372,6 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         // continue to use resources when the app is stopped.
         if (mSensorManager != null)
             mSensorManager.unregisterListener(this);
-
-        //lobby.removeValue();
-        //getActivity().finish();
     }
 
 
@@ -415,7 +383,6 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         int sensorType = sensorEvent.sensor.getType();
 
         // The sensorEvent object is reused across calls to onSensorChanged().
-        // clone() gets a copy so the data doesn't change out from under us
         switch (sensorType) {
             case Sensor.TYPE_ACCELEROMETER:
                 mAccelerometerData = sensorEvent.values.clone();
@@ -429,9 +396,6 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         // Compute the rotation matrix: merges and translates the data
         // from the accelerometer and magnetometer, in the device coordinate
         // system, into a matrix in the world's coordinate system.
-        //
-        // The second argument is an inclination matrix, which isn't
-        // used in this example.
         float[] rotationMatrix = new float[9];
         boolean rotationOK = SensorManager.getRotationMatrix(rotationMatrix,
                 null, mAccelerometerData, mMagnetometerData);
@@ -447,9 +411,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
 
         // Pull out the individual values from the array.
         double azimuth = orientationValues[0];
-
-
-        //azimuth = (azimuth + 0 + 360) % 360;
+        // then calculate the degree from flags
         azimuth = (azimuth < 0) ? (float) (2 * Math.PI + azimuth) : azimuth;
         azimuth = Math.toDegrees(azimuth);
         azimuthDeg = azimuth;
@@ -459,15 +421,9 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         double formula = Math.floor(((angleFromOtherFlag - azimuthDeg + 360) % 360) * 100) /100;
         double formula2 = Math.floor(((angleFromMyFlag - azimuthDeg + 360) % 360) * 100) /100;
 
-        // need to update instead ov an ImageView containing the arrows
-        //degreeFromOtherView.setText(formula + "");
-        //degreeFromMyTeamFlagView.setText(formula2 + "");
-
         // update rotation of compasses in real time
         compassLeft.setRotation(Double.valueOf(formula).floatValue());
         compassRight.setRotation(Double.valueOf(formula2).floatValue());
-
-
     }
 
     /**
@@ -475,8 +431,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
      * unused in this app.
      */
     @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-    }
+    public void onAccuracyChanged(Sensor sensor, int i) { }
 
     // --------------------------- PERMISSION CHECKER ---------------------------------------------
 
