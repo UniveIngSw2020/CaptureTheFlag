@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.Toast;
+
 import com.google.android.material.tabs.TabLayout;
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -24,7 +26,6 @@ public class GameActivity extends AppCompatActivity {
     private boolean isGoingBack = false;
     private boolean isChangingActivity = false;
     private boolean isGoingBackground = false;
-    private boolean isFinishingGame = false;
     // reference to the lobby where I'm in
     private DatabaseReference lobby;
 
@@ -61,29 +62,24 @@ public class GameActivity extends AppCompatActivity {
                 // state of game controller
                 // isGoingBack used to end the game just for a single instance
                 if (snapshot.child("State").getValue() != null && !isGoingBack
-                        && !isGoingBackground && !isFinishingGame) {
-                    // end the actual game if it's ended
+                        && !isGoingBackground && !isChangingActivity) {
+
+                    // end the actual game if it's ended, then end the game
                     if (Objects.requireNonNull(snapshot.child("State")
                             .getValue()).toString().equals("End")) {
-                        isFinishingGame = true;
-                        isChangingActivity = true;
                         endGame(Objects.requireNonNull(snapshot.child("Score")
                                 .getValue()).toString());
                     }
 
-                    // check if the game has been cancelled
+                    // check if the game has been cancelled, then end the game
                     else if (Objects.requireNonNull(snapshot.child("State")
                             .getValue()).toString().equals("Cancelled")) {
-                        isFinishingGame = true;
-                        isChangingActivity = true;
                         endGame("Cancelled");
                     }
 
-                    // cancel the game if the numbers of player is too low
+                    // cancel the game if the numbers of player is too low, then and the game
                     else if (Integer.parseInt(Objects.requireNonNull(snapshot.child("Number of players")
                             .getValue()).toString()) < 4) {
-                        isFinishingGame = true;
-                        isChangingActivity = true;
                         lobby.child("State").setValue("Cancelled");
                         endGame("Cancelled");
                     }
@@ -109,6 +105,7 @@ public class GameActivity extends AppCompatActivity {
 
     // this will switch to another activity to manage the END of the game in different scenarios
     private void endGame(String score){
+        isChangingActivity = true;
         Intent i = new Intent(GameActivity.this, ScoreActivity.class);
         i.putExtra("score", score);
         i.putExtra("team", team);

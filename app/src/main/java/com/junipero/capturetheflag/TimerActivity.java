@@ -17,6 +17,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Objects;
+
 public class TimerActivity extends AppCompatActivity {
 
     // array containing data of my game (gameCode, my role, my team color)
@@ -104,7 +106,7 @@ public class TimerActivity extends AppCompatActivity {
                 }
 
                 // also get number of players of the actual lobby
-                if(snapshot.getValue() != null){
+                if(snapshot.getValue() != null && snapshot.child("Number of players").getValue() != null){
                     numOfPlayers = Integer.parseInt(snapshot.child("Number of players")
                             .getValue().toString());
                 }
@@ -147,7 +149,6 @@ public class TimerActivity extends AppCompatActivity {
                     startActivity(i);
                 }
                 finish();
-
             }
         }.start();
 
@@ -161,7 +162,7 @@ public class TimerActivity extends AppCompatActivity {
         StoredDataManager sdm = new StoredDataManager(TimerActivity.this.getFilesDir());
         // then remove data
         lobby.child(data[2]).child(data[1]).child(sdm.readID()).removeValue();
-        finish();
+        //finish();
     }
 
     @Override

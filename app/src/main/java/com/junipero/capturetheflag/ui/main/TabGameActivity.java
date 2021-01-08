@@ -127,7 +127,7 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
         if(role.equals("Stealer")){
             View flag_bg = view.findViewById(R.id.flagbggame);
             flag_bg.setVisibility(View.INVISIBLE);
-                /* default locations, will update after the game is in running */
+                /* default locations, will be updated after the game is in execution by flags */
                 otherTeamFlagRef.child("Location").child("Latitude")
                         .setValue(45.485158);
                 otherTeamFlagRef.child("Location").child("Longitude")
@@ -252,10 +252,13 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                                 // obtain distances between my position and the two flags
                                 long distanceFromOtherFlag = calculateDistance(location.getLatitude(),
                                         location.getLongitude(), otherFlagPos[0], otherFlagPos[1]);
-                                distanceFromOtherView.setText("Distance from\nother team's flag:\n" + distanceFromOtherFlag + " meters");
+                                distanceFromOtherView.setText("Distance from\nother team's flag:\n"
+                                        + distanceFromOtherFlag + " meters");
+
                                 long distanceFromMyFlag = calculateDistance(location.getLatitude(),
                                         location.getLongitude(), myFlagPos[0], myFlagPos[1]);
-                                distanceFromMyTeamFlagView.setText("Distance from\nmy team's flag:\n" + distanceFromMyFlag + " meters");
+                                distanceFromMyTeamFlagView.setText("Distance from\nmy team's flag:\n"
+                                        + distanceFromMyFlag + " meters");
 
                                 numberOfPlayers = Integer.parseInt(snapshot.child("Number of players").getValue().toString());
 
@@ -264,14 +267,14 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                                     String status = snapshot.child("State").getValue().toString();
                                     // TIE when each team is winning
                                     if(status.equals(otherTeam + " is winning")){
-                                        lobby.child("State").setValue("End");
                                         lobby.child("Score").setValue("Tie");
+                                        lobby.child("State").setValue("End");
                                         //endGame("Tie");
                                     }
                                     // If my team is Winning so My team will WIN the game
                                     else if (status.equals(team + " is winning")){
-                                        lobby.child("State").setValue("End");
                                         lobby.child("Score").setValue(team + " wins");
+                                        lobby.child("State").setValue("End");
                                         //endGame(team + " wins");
                                     } else {
                                         // set state to my team os winning and re-check after
@@ -311,9 +314,10 @@ public class TabGameActivity extends Fragment implements SensorEventListener {
                                         .toString().equals("Cancelled")){
                                     localState = "Cancelled";
                                 }
-                                numberOfPlayers = Integer.parseInt(Objects
-                                        .requireNonNull(snapshot.child("Number of players")
-                                                .getValue()).toString());
+                                if(snapshot.child("Number of players").getValue() != null) {
+                                    numberOfPlayers = Integer.parseInt(snapshot.child("Number of players")
+                                            .getValue().toString());
+                                }
                             }
                         }
 
